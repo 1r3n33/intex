@@ -1,82 +1,161 @@
-import Web3 from "web3";
-import votingArtifact from "../../build/contracts/Voting.json";
+// Import the page's CSS. Webpack will know what to do with it.
+import "./app.css";
 
-let candidates = {"Rama": "candidate-1", "Nick": "candidate-2", "Jose": "candidate-3"}
+// Import libraries we need.
+import { default as Web3} from 'web3';
+import { default as contract } from '@truffle/contract'
 
-const App = {
-  web3: null,
-  account: null,
-  voting: null,
+/*
+ * When you compile and deploy your Voting contract,
+ * truffle stores the abi and deployed address in a json
+ * file in the build directory. We will use this information
+ * to setup a Voting abstraction. We will use this abstraction
+ * later to create an instance of the Voting contract.
+ * Compare this against the index.js from our previous tutorial to see the difference
+ * https://gist.github.com/maheshmurthy/f6e96d6b3fff4cd4fa7f892de8a1a1b4#file-index-js
+ */
 
-  start: async function() {
-    const { web3 } = this;
+import voting_artifacts from '../../build/contracts/Voting.json'
 
-    try {
-      // Get the network we are connected to and then read the build/contracts/Voting.json and instantiate a contract object to use
+var Voting = contract(voting_artifacts);
 
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = votingArtifact.networks[networkId];
-      this.voting = new web3.eth.Contract(
-        votingArtifact.abi,
-        deployedNetwork.address,
-      );
+let candidates = {}
 
-      // get accounts
-      const accounts = await web3.eth.getAccounts();
-      this.account = accounts[0];
+let tokenPrice = null;
 
-      this.loadCandidatesAndVotes();
-    } catch (error) {
-      console.error("Could not connect to contract or chain.");
-    }
-  },
+window.voteForCandidate = function(candidate) {
+  let candidateName = $("#candidate").val();
+  let voteTokens = $("#vote-tokens").val();
+  $("#msg").html("Vote has been submitted. The vote count will increment as soon as the vote is recorded on the blockchain. Please wait.")
+  $("#candidate").val("");
+  $("#vote-tokens").val("");
 
-  loadCandidatesAndVotes: async function() {
-    const { totalVotesFor } = this.voting.methods;
+  /* Voting.deployed() returns an instance of the contract. Every call
+   * in Truffle returns a promise which is why we have used then()
+   * everywhere we have a transaction call
+   */
+  Voting.deployed().then(function(contractInstance) {
+    web3.eth.getAccounts().then(function(accounts) {
+      contractInstance.voteForCandidate(web3.utils.asciiToHex(candidateName), voteTokens, {gas: 140000, from: accounts[0]}).then(function() {
+        let div_id = candidates[candidateName];
+        return contractInstance.totalVotesFor.call(web3.utils.asciiToHex(candidateName)).then(function(v) {
+          $("#" + div_id).html(v.toString());
+          $("#msg").html("");
+        });
+      });
+    })
+  });
+}
 
-    let candidateNames = Object.keys(candidates);
-    for (var i = 0; i < candidateNames.length; i++) {
-      let name = candidateNames[i];
-      var count = await totalVotesFor(this.web3.utils.asciiToHex(name)).call();
-      $("#" + candidates[name]).html(count);
-    }
-  },
+/* The user enters the total no. of tokens to buy. We calculate the total cost and send it in
+ * the request. We have to send the value in Wei. So, we use the toWei helper method to convert
+ * from Ether to Wei.
+ */
 
-  voteForCandidate: async function() {
-    let candidateName = $("#candidate").val();
-    $("#msg").html("Vote has been submitted. The vote count will increment as soon as the vote is recorded on the blockchain. Please wait.")
-    $("#candidate").val("");
+window.buyTokens = function() {
+  let tokensToBuy = $("#buy").val();
+  let price = tokensToBuy * tokenPrice;
+  $("#buy-msg").html("Purchase order has been submitted. Please wait.");
+  Voting.deployed().then(function(contractInstance) {
+    web3.eth.getAccounts().then(function(accounts) {
+      contractInstance.buy({value: web3.utils.toWei(price.toString(), 'ether'), from: accounts[0]}).then(function(v) {
+        $("#buy-msg").html("");
+        web3.eth.getBalance(contractInstance.address, function(error, result) {
+          $("#contract-balance").html(web3.utils.fromWei(result.toString()) + " Ether");
+        });
+      })
+    })
+  });
+  populateTokenData();
+}
 
-    const { totalVotesFor, voteForCandidate } = this.voting.methods;
-    
-    /* Voting.deployed() returns an instance of the contract. Every call
-     * in Truffle returns a promise which is why we have used then()
-     * everywhere we have a transaction call
-     */
-    await voteForCandidate(this.web3.utils.asciiToHex(candidateName)).send({gas: 140000, from: this.account});
-    let div_id = candidates[candidateName];
-    var count = await totalVotesFor(this.web3.utils.asciiToHex(candidateName)).call();
-    $("#" + div_id).html(count);
-    $("#msg").html("");
+window.lookupVoterInfo = function() {
+  let address = $("#voter-info").val();
+  Voting.deployed().then(function(contractInstance) {
+    contractInstance.voterDetails.call(address).then(function(v) {
+      $("#tokens-bought").html("Total Tokens bought: " + v[0].toString());
+      let votesPerCandidate = v[1];
+      $("#votes-cast").empty();
+      $("#votes-cast").append("Votes cast per candidate: <br>");
+      let allCandidates = Object.keys(candidates);
+      for(let i=0; i < allCandidates.length; i++) {
+        $("#votes-cast").append(allCandidates[i] + ": " + votesPerCandidate[i] + "<br>");
+      }
+    });
+  });
+}
+
+/* Instead of hardcoding the candidates hash, we now fetch the candidate list from
+ * the blockchain and populate the array. Once we fetch the candidates, we setup the
+ * table in the UI with all the candidates and the votes they have received.
+ */
+function populateCandidates() {
+  Voting.deployed().then(function(contractInstance) {
+    contractInstance.allCandidates.call().then(function(candidateArray) {
+      for(let i=0; i < candidateArray.length; i++) {
+        /* We store the candidate names as bytes32 on the blockchain. We use the
+         * handy toUtf8 method to convert from bytes32 to string
+         */
+        candidates[web3.utils.toUtf8(candidateArray[i])] = "candidate-" + i;
+      }
+      setupCandidateRows();
+      populateCandidateVotes();
+      populateTokenData();
+    });
+  });
+}
+
+function populateCandidateVotes() {
+  let candidateNames = Object.keys(candidates);
+  for (var i = 0; i < candidateNames.length; i++) {
+    let name = candidateNames[i];
+    Voting.deployed().then(function(contractInstance) {
+      contractInstance.totalVotesFor.call(web3.utils.asciiToHex(name)).then(function(v) {
+        $("#" + candidates[name]).html(v.toString());
+      });
+    });
   }
-};
+}
 
-window.App = App;
+function setupCandidateRows() {
+  Object.keys(candidates).forEach(function (candidate) { 
+    $("#candidate-rows").append("<tr><td>" + candidate + "</td><td id='" + candidates[candidate] + "'></td></tr>");
+  });
+}
 
-window.addEventListener("load", function() {
-  if (window.ethereum) {
-    // use MetaMask's provider
-    App.web3 = new Web3(window.ethereum);
-    window.ethereum.enable(); // get permission to access accounts
+/* Fetch the total tokens, tokens available for sale and the price of
+ * each token and display in the UI
+ */
+function populateTokenData() {
+  Voting.deployed().then(function(contractInstance) {
+    contractInstance.totalTokens().then(function(v) {
+      $("#tokens-total").html(v.toString());
+    });
+    contractInstance.tokensSold.call().then(function(v) {
+      $("#tokens-sold").html(v.toString());
+    });
+    contractInstance.tokenPrice().then(function(v) {
+      tokenPrice = parseFloat(web3.utils.fromWei(v.toString()));
+      $("#token-cost").html(tokenPrice + " Ether");
+    });
+    web3.eth.getBalance(contractInstance.address, function(error, result) {
+      $("#contract-balance").html(web3.utils.fromWei(result.toString()) + " Ether");
+    });
+  });
+}
+
+$( document ).ready(function() {
+  if (typeof web3 !== 'undefined') {
+    console.warn("Using web3 detected from external source like Metamask")
+    // Use Mist/MetaMask's provider
+    window.web3 = new Web3(web3.currentProvider);
   } else {
-    console.warn(
-      "No web3 detected. Falling back to http://127.0.0.1:8545. You should remove this fallback when you deploy live",
-    );
+    console.warn("No web3 detected. Falling back to http://localhost:8545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask");
     // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-    App.web3 = new Web3(
-      new Web3.providers.HttpProvider("http://127.0.0.1:8545"),
-    );
+    window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
   }
 
-  App.start();
+  Voting.setProvider(web3.currentProvider);
+  populateCandidates();
+
 });
