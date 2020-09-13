@@ -1,7 +1,42 @@
 pragma solidity ^0.7.1;
 // We have to specify what version of compiler this code will compile with
 
+import "./iab/IAB.sol";
+
 contract Voting {
+
+  struct Vendor {
+    bytes32 name;
+  }
+
+  struct ContentAnalysis {
+    IAB.UnsafeDigitalEnvironment iabUnsafeDigitalEnvironment;
+    IAB.CategoryTop iabCategory;
+    IAB.ContentTaxonomyTier1 iabContentTaxonomy;
+  }
+
+  bytes32[] public vendorNames;
+  mapping (address => Vendor) public vendorsByAddress;
+
+  mapping (bytes32 => ContentAnalysis) public contentAnalysis;
+
+  // Add vendor.
+  // Vendors are capable to call addContentAnalysis.
+  function addVendor(bytes32 name) public
+  {
+    vendorNames.push(name);
+  }
+
+  // Add ContentAnalysis.
+  // Only vendors are capable to store ContentAnalysis.
+  function addContentAnalysis() public
+  {
+  }
+
+  function allVendorNames() public view returns (bytes32[] memory)
+  {
+    return vendorNames;
+  }
 
   // We use the struct datatype to store the voter information.
   struct voter {

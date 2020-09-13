@@ -105,6 +105,15 @@ function populateCandidates() {
   });
 }
 
+function populateVendors() {
+  Voting.deployed().then(function(contractInstance) {
+    contractInstance.allVendorNames.call().then(function(vendorNames) {
+      for(let i=0; i < vendorNames.length; i++) {
+      }
+    });
+  });
+}
+
 function populateCandidateVotes() {
   let candidateNames = Object.keys(candidates);
   for (var i = 0; i < candidateNames.length; i++) {
@@ -157,5 +166,6 @@ $( document ).ready(function() {
 
   Voting.setProvider(web3.currentProvider);
   populateCandidates();
+  populateVendors();
 
 });
