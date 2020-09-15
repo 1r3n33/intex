@@ -20,6 +20,7 @@ import voting_artifacts from '../../build/contracts/Voting.json'
 var Voting = contract(voting_artifacts);
 
 let candidates = {}
+let vendors = {}
 
 let tokenPrice = null;
 
@@ -105,12 +106,9 @@ function populateCandidates() {
   });
 }
 
-function populateVendors() {
-  Voting.deployed().then(function(contractInstance) {
-    contractInstance.allVendorNames.call().then(function(vendorNames) {
-      for(let i=0; i < vendorNames.length; i++) {
-      }
-    });
+function setupCandidateRows() {
+  Object.keys(candidates).forEach(function (candidate) {
+    $("#candidate-rows").append("<tr><td>" + candidate + "</td><td id='" + candidates[candidate] + "'></td></tr>");
   });
 }
 
@@ -126,9 +124,22 @@ function populateCandidateVotes() {
   }
 }
 
-function setupCandidateRows() {
-  Object.keys(candidates).forEach(function (candidate) { 
-    $("#candidate-rows").append("<tr><td>" + candidate + "</td><td id='" + candidates[candidate] + "'></td></tr>");
+function populateVendors() {
+  Voting.deployed().then(function(contractInstance) {
+    contractInstance.vendors().then(function(_vendors) {
+      console.log(_vendors)
+      for(let i=0; i < _vendors.length; i++) {
+        let name = web3.utils.toUtf8(_vendors[i]['name'])
+        vendors[name] = _vendors[i];
+      }
+      setupVendorRows();
+    });
+  });
+}
+
+function setupVendorRows() {
+  Object.keys(vendors).forEach(function (vendor) {
+    $("#vendor-rows").append("<tr><td>" + web3.utils.toUtf8(vendors[vendor]['name']) + "</td><td>" + vendors[vendor]['addr'] + "</td></tr>");
   });
 }
 

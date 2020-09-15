@@ -1,4 +1,5 @@
 pragma solidity ^0.7.1;
+pragma experimental ABIEncoderV2;
 // We have to specify what version of compiler this code will compile with
 
 import "./iab/IAB.sol";
@@ -6,7 +7,9 @@ import "./iab/IAB.sol";
 contract Voting {
 
   struct Vendor {
+    address addr;
     bytes32 name;
+    uint256 tokenCount;
   }
 
   struct ContentAnalysis {
@@ -15,27 +18,34 @@ contract Voting {
     IAB.ContentTaxonomyTier1 iabContentTaxonomy;
   }
 
-  bytes32[] public vendorNames;
-  mapping (address => Vendor) public vendorsByAddress;
+  address[] public vendorAddresses;
+  mapping (address => Vendor) public vendorByAddress;
 
   mapping (bytes32 => ContentAnalysis) public contentAnalysis;
 
   // Add vendor.
   // Vendors are capable to call addContentAnalysis.
-  function addVendor(bytes32 name) public
+  function addVendor(address addr, bytes32 name) public
   {
-    vendorNames.push(name);
+    // TODO: Check if address already exist
+    vendorAddresses.push(msg.sender);
+    vendorByAddress[msg.sender] = Vendor(addr, name, 1000);
+  }
+
+  function vendors() view public returns (Vendor[] memory)
+  {
+    Vendor[] memory _vendors = new Vendor[](vendorAddresses.length);
+    for (uint i=0; i<vendorAddresses.length; i++)
+    {
+      _vendors[i] = vendorByAddress[vendorAddresses[i]];
+    }
+    return _vendors;
   }
 
   // Add ContentAnalysis.
   // Only vendors are capable to store ContentAnalysis.
   function addContentAnalysis() public
   {
-  }
-
-  function allVendorNames() public view returns (bytes32[] memory)
-  {
-    return vendorNames;
   }
 
   // We use the struct datatype to store the voter information.
