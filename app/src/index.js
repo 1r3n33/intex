@@ -48,6 +48,23 @@ window.voteForCandidate = function(candidate) {
   });
 }
 
+window.addVendor = function(vendor) {
+  let vendorAddress = $("#vendor-addr").val();
+  let vendorName = $("#vendor-name").val();
+  $("#msg-vendor").html("Adding vendor request has been submitted. The vendor will be added as soon as the operation is recorded on the blockchain. Please wait.")
+
+  Voting.deployed().then(function(contractInstance) {
+    web3.eth.getAccounts().then(function(accounts) {
+      contractInstance.addVendor(vendorAddress, web3.utils.asciiToHex(vendorName), {from: accounts[0]}).then(function() {
+        $("#msg-vendor").html("");
+        $("#vendor-addr").val("");
+        $("#vendor-name").val("");
+        appendVendorRow(vendorName, vendorAddress);
+      });
+    })
+  });
+}
+
 /* The user enters the total no. of tokens to buy. We calculate the total cost and send it in
  * the request. We have to send the value in Wei. So, we use the toWei helper method to convert
  * from Ether to Wei.
@@ -127,7 +144,6 @@ function populateCandidateVotes() {
 function populateVendors() {
   Voting.deployed().then(function(contractInstance) {
     contractInstance.vendors().then(function(_vendors) {
-      console.log(_vendors)
       for(let i=0; i < _vendors.length; i++) {
         let name = web3.utils.toUtf8(_vendors[i]['name'])
         vendors[name] = _vendors[i];
@@ -139,8 +155,12 @@ function populateVendors() {
 
 function setupVendorRows() {
   Object.keys(vendors).forEach(function (vendor) {
-    $("#vendor-rows").append("<tr><td>" + web3.utils.toUtf8(vendors[vendor]['name']) + "</td><td>" + vendors[vendor]['addr'] + "</td></tr>");
+    appendVendorRow(web3.utils.toUtf8(vendors[vendor]['name']), vendors[vendor]['addr'])
   });
+}
+
+function appendVendorRow(vendorName, vendorAddress) {
+  $("#vendor-rows").append("<tr><td>" + vendorName + "</td><td>" + vendorAddress + "</td></tr>");
 }
 
 /* Fetch the total tokens, tokens available for sale and the price of

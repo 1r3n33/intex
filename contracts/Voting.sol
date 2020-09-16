@@ -28,8 +28,8 @@ contract Voting {
   function addVendor(address addr, bytes32 name) public
   {
     // TODO: Check if address already exist
-    vendorAddresses.push(msg.sender);
-    vendorByAddress[msg.sender] = Vendor(addr, name, 1000);
+    vendorAddresses.push(addr);
+    vendorByAddress[addr] = Vendor(addr, name, 1000);
   }
 
   function vendors() view public returns (Vendor[] memory)
