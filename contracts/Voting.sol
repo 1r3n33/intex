@@ -27,7 +27,7 @@ contract Voting {
   // Vendors are capable to call addContentAnalysis.
   function addVendor(address addr, bytes32 name) public
   {
-    // TODO: Check if address already exist
+    require(vendorByAddress[addr].addr == address(0), "Vendor address already exists");
     vendorAddresses.push(addr);
     vendorByAddress[addr] = Vendor(addr, name, 1000);
   }
