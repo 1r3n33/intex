@@ -24,30 +24,6 @@ let vendors = {}
 
 let tokenPrice = null;
 
-window.voteForCandidate = function(candidate) {
-  let candidateName = $("#candidate").val();
-  let voteTokens = $("#vote-tokens").val();
-  $("#msg").html("Vote has been submitted. The vote count will increment as soon as the vote is recorded on the blockchain. Please wait.")
-  $("#candidate").val("");
-  $("#vote-tokens").val("");
-
-  /* Voting.deployed() returns an instance of the contract. Every call
-   * in Truffle returns a promise which is why we have used then()
-   * everywhere we have a transaction call
-   */
-  Voting.deployed().then(function(contractInstance) {
-    web3.eth.getAccounts().then(function(accounts) {
-      contractInstance.voteForCandidate(web3.utils.asciiToHex(candidateName), voteTokens, {gas: 140000, from: accounts[0]}).then(function() {
-        let div_id = candidates[candidateName];
-        return contractInstance.totalVotesFor.call(web3.utils.asciiToHex(candidateName)).then(function(v) {
-          $("#" + div_id).html(v.toString());
-          $("#msg").html("");
-        });
-      });
-    })
-  });
-}
-
 window.addVendor = function(vendor) {
   let vendorAddress = $("#vendor-addr").val();
   let vendorName = $("#vendor-name").val();
@@ -69,7 +45,6 @@ window.addVendor = function(vendor) {
  * the request. We have to send the value in Wei. So, we use the toWei helper method to convert
  * from Ether to Wei.
  */
-
 window.buyTokens = function() {
   let tokensToBuy = $("#buy").val();
   let price = tokensToBuy * tokenPrice;
@@ -101,44 +76,6 @@ window.lookupVoterInfo = function() {
       }
     });
   });
-}
-
-/* Instead of hardcoding the candidates hash, we now fetch the candidate list from
- * the blockchain and populate the array. Once we fetch the candidates, we setup the
- * table in the UI with all the candidates and the votes they have received.
- */
-function populateCandidates() {
-  Voting.deployed().then(function(contractInstance) {
-    contractInstance.allCandidates.call().then(function(candidateArray) {
-      for(let i=0; i < candidateArray.length; i++) {
-        /* We store the candidate names as bytes32 on the blockchain. We use the
-         * handy toUtf8 method to convert from bytes32 to string
-         */
-        candidates[web3.utils.toUtf8(candidateArray[i])] = "candidate-" + i;
-      }
-      setupCandidateRows();
-      populateCandidateVotes();
-      populateTokenData();
-    });
-  });
-}
-
-function setupCandidateRows() {
-  Object.keys(candidates).forEach(function (candidate) {
-    $("#candidate-rows").append("<tr><td>" + candidate + "</td><td id='" + candidates[candidate] + "'></td></tr>");
-  });
-}
-
-function populateCandidateVotes() {
-  let candidateNames = Object.keys(candidates);
-  for (var i = 0; i < candidateNames.length; i++) {
-    let name = candidateNames[i];
-    Voting.deployed().then(function(contractInstance) {
-      contractInstance.totalVotesFor.call(web3.utils.asciiToHex(name)).then(function(v) {
-        $("#" + candidates[name]).html(v.toString());
-      });
-    });
-  }
 }
 
 function populateVendors() {
@@ -196,7 +133,5 @@ $( document ).ready(function() {
   }
 
   Voting.setProvider(web3.currentProvider);
-  populateCandidates();
   populateVendors();
-
 });
