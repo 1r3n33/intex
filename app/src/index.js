@@ -35,7 +35,7 @@ window.addVendor = function(vendor) {
         $("#msg-vendor").html("");
         $("#vendor-addr").val("");
         $("#vendor-name").val("");
-        appendVendorRow(vendorName, vendorAddress);
+        appendVendorRow(vendorName, vendorAddress, 1000);
       });
     })
   });
@@ -92,12 +92,12 @@ function populateVendors() {
 
 function setupVendorRows() {
   Object.keys(vendors).forEach(function (vendor) {
-    appendVendorRow(web3.utils.toUtf8(vendors[vendor]['name']), vendors[vendor]['addr'])
+    appendVendorRow(web3.utils.toUtf8(vendors[vendor]['name']), vendors[vendor]['addr'], vendors[vendor]['tokenCount'])
   });
 }
 
-function appendVendorRow(vendorName, vendorAddress) {
-  $("#vendor-rows").append("<tr><td>" + vendorName + "</td><td>" + vendorAddress + "</td></tr>");
+function appendVendorRow(vendorName, vendorAddress, vendorTokenCount) {
+  $("#vendor-rows").append("<tr><td>" + vendorName + "</td><td>" + vendorAddress + "</td><td>" + vendorTokenCount + "</td></tr>");
 }
 
 /* Fetch the total tokens, tokens available for sale and the price of
