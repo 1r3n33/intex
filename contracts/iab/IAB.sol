@@ -29,7 +29,7 @@ contract IAB
 
     enum CategoryTop
     {
-        Zero,
+        _Zero,
         ArtsAndEntertainment,
         Automotive,
         Business,
@@ -88,7 +88,8 @@ contract IAB
         TechnologyAndComputing,
         Television,
         Travel,
-        VideoGaming
+        VideoGaming,
+        Unknown
     }
 
     enum ContentChannel

@@ -13,6 +13,7 @@ contract Voting {
   }
 
   struct ContentAnalysis {
+    uint256 timestamp;
     IAB.UnsafeDigitalEnvironment iabUnsafeDigitalEnvironment;
     IAB.CategoryTop iabCategory;
     IAB.ContentTaxonomyTier1 iabContentTaxonomy;
@@ -21,7 +22,7 @@ contract Voting {
   address[] public vendorAddresses;
   mapping (address => Vendor) public vendorByAddress;
 
-  mapping (bytes32 => ContentAnalysis) public contentAnalysis;
+  mapping (bytes32 => ContentAnalysis) public contentAnalysisByHash;
 
   // Add vendor.
   // Vendors are capable to call addContentAnalysis.
@@ -44,8 +45,14 @@ contract Voting {
 
   // Add ContentAnalysis.
   // Only vendors are capable to store ContentAnalysis.
-  function addContentAnalysis() public
+  function addContentAnalysis(bytes32 hash, IAB.UnsafeDigitalEnvironment unsafeDigitalEnvironment) public
   {
+    require(vendorByAddress[msg.sender].addr == msg.sender);
+    contentAnalysisByHash[hash] = ContentAnalysis(
+      block.timestamp,
+      unsafeDigitalEnvironment,
+      IAB.CategoryTop.Uncategorized,
+      IAB.ContentTaxonomyTier1.Unknown);
   }
 
   // We use the struct datatype to store the voter information.
