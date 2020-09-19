@@ -9,14 +9,14 @@
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.5",
+    "css-loader": "^4.3.0",
+    "style-loader": "^1.2.1",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0"
   },
   "dependencies": {
-    "@truffle/contract": "^4.2.21",
-    "css-loader": "^4.3.0",
-    "style-loader": "^1.2.1",
+    "@truffle/contract": "^4.2.22",
     "web3": "^1.2.4"
   }
 }
