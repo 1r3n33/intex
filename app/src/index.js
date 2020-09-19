@@ -41,6 +41,16 @@ window.addVendor = function(vendor) {
   });
 }
 
+window.getHash = function(hash) {
+  let vendorAddress = $("#gethash-addr").val();
+  let uri = $("#gethash-uri").val();
+
+  hash = web3.utils.keccak256(vendorAddress+uri)
+
+  $("#gethash-normalized-uri").html(uri);
+  $("#gethash-hash").html(hash);
+}
+
 /* The user enters the total no. of tokens to buy. We calculate the total cost and send it in
  * the request. We have to send the value in Wei. So, we use the toWei helper method to convert
  * from Ether to Wei.
