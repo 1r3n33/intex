@@ -44,15 +44,22 @@ contract Voting {
   }
 
   // Add ContentAnalysis.
-  // Only vendors are capable to store ContentAnalysis.
   function addContentAnalysis(bytes32 hash, IAB.UnsafeDigitalEnvironment unsafeDigitalEnvironment) public
   {
-    require(vendorByAddress[msg.sender].addr == msg.sender);
+    Vendor storage vendor = vendorByAddress[msg.sender];
+
+    require(vendor.addr == msg.sender, "Sender must be vendor");
+    require(vendor.tokenCount >= 1, "Unsufficient funds");
+
+    // Store ContentAnalysis
     contentAnalysisByHash[hash] = ContentAnalysis(
       block.timestamp,
       unsafeDigitalEnvironment,
       IAB.CategoryTop.Uncategorized,
       IAB.ContentTaxonomyTier1.Unknown);
+
+    // Payment
+    vendor.tokenCount = vendor.tokenCount-1;
   }
 
   // We use the struct datatype to store the voter information.
