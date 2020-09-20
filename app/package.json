@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@truffle/contract": "^4.2.22",
+    "normalize-url": "^5.1.0",
     "web3": "^1.2.4"
   }
 }

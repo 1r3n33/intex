@@ -4,6 +4,7 @@ import "./app.css";
 // Import libraries we need.
 import { default as Web3} from 'web3';
 import { default as contract } from '@truffle/contract'
+import { default as normalizeUrl } from 'normalize-url'
 
 /*
  * When you compile and deploy your Voting contract,
@@ -45,9 +46,11 @@ window.getHash = function(hash) {
   let vendorAddress = $("#gethash-addr").val();
   let uri = $("#gethash-uri").val();
 
-  hash = web3.utils.keccak256(vendorAddress+uri)
+  let normalizedUri = normalizeUrl(uri, {stripProtocol: true, stripHash: true})
 
-  $("#gethash-normalized-uri").html(uri);
+  hash = web3.utils.keccak256(vendorAddress+normalizedUri)
+
+  $("#gethash-normalized-uri").html(normalizedUri);
   $("#gethash-hash").html(hash);
 }
 
