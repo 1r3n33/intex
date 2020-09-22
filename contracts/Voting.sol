@@ -13,16 +13,24 @@ contract Voting {
   }
 
   struct ContentAnalysis {
+    address vendor;
     uint256 timestamp;
     IAB.UnsafeDigitalEnvironment iabUnsafeDigitalEnvironment;
     IAB.CategoryTop iabCategory;
     IAB.ContentTaxonomyTier1 iabContentTaxonomy;
   }
 
+  struct ContentVerification {
+    address verifier;
+    bytes32 urlVendorHash;
+  }
+
   address[] public vendorAddresses;
   mapping (address => Vendor) public vendorByAddress;
 
   mapping (bytes32 => ContentAnalysis) public contentAnalysisByHash;
+
+  mapping (bytes32 => ContentVerification) public contentVerificationByHash;
 
   // Add vendor.
   // Vendors are capable to call addContentAnalysis.
@@ -44,7 +52,7 @@ contract Voting {
   }
 
   // Add ContentAnalysis.
-  function addContentAnalysis(bytes32 hash, IAB.UnsafeDigitalEnvironment unsafeDigitalEnvironment) public
+  function addContentAnalysis(bytes32 urlVendorHash, IAB.UnsafeDigitalEnvironment unsafeDigitalEnvironment) public
   {
     Vendor storage vendor = vendorByAddress[msg.sender];
 
@@ -52,7 +60,8 @@ contract Voting {
     require(vendor.tokenCount >= 1, "Unsufficient funds");
 
     // Store ContentAnalysis
-    contentAnalysisByHash[hash] = ContentAnalysis(
+    contentAnalysisByHash[urlVendorHash] = ContentAnalysis(
+      vendor.addr,
       block.timestamp,
       unsafeDigitalEnvironment,
       IAB.CategoryTop.Uncategorized,
@@ -60,6 +69,20 @@ contract Voting {
 
     // Payment
     vendor.tokenCount = vendor.tokenCount-1;
+  }
+
+  // Content check
+  function checkContentAnalysis(bytes32 verificationHash, bytes32 urlVendorHash) public returns (bytes32)
+  {
+    ContentAnalysis memory contentAnalysis = contentAnalysisByHash[urlVendorHash];
+    Vendor storage vendor = vendorByAddress[contentAnalysis.vendor];
+    
+    contentVerificationByHash[verificationHash] = ContentVerification(
+      msg.sender,
+      urlVendorHash);
+
+    // Payment
+    vendor.tokenCount = vendor.tokenCount+1;
   }
 
   // We use the struct datatype to store the voter information.
