@@ -20,10 +20,7 @@ import voting_artifacts from '../../build/contracts/Voting.json'
 
 var Voting = contract(voting_artifacts);
 
-let candidates = {}
 let vendors = {}
-
-let tokenPrice = null;
 
 window.addVendor = function(vendor) {
   let vendorAddress = $("#vendor-addr").val();
@@ -54,43 +51,6 @@ window.getHash = function(hash) {
   $("#gethash-hash").html(hash);
 }
 
-/* The user enters the total no. of tokens to buy. We calculate the total cost and send it in
- * the request. We have to send the value in Wei. So, we use the toWei helper method to convert
- * from Ether to Wei.
- */
-window.buyTokens = function() {
-  let tokensToBuy = $("#buy").val();
-  let price = tokensToBuy * tokenPrice;
-  $("#buy-msg").html("Purchase order has been submitted. Please wait.");
-  Voting.deployed().then(function(contractInstance) {
-    web3.eth.getAccounts().then(function(accounts) {
-      contractInstance.buy({value: web3.utils.toWei(price.toString(), 'ether'), from: accounts[0]}).then(function(v) {
-        $("#buy-msg").html("");
-        web3.eth.getBalance(contractInstance.address, function(error, result) {
-          $("#contract-balance").html(web3.utils.fromWei(result.toString()) + " Ether");
-        });
-      })
-    })
-  });
-  populateTokenData();
-}
-
-window.lookupVoterInfo = function() {
-  let address = $("#voter-info").val();
-  Voting.deployed().then(function(contractInstance) {
-    contractInstance.voterDetails.call(address).then(function(v) {
-      $("#tokens-bought").html("Total Tokens bought: " + v[0].toString());
-      let votesPerCandidate = v[1];
-      $("#votes-cast").empty();
-      $("#votes-cast").append("Votes cast per candidate: <br>");
-      let allCandidates = Object.keys(candidates);
-      for(let i=0; i < allCandidates.length; i++) {
-        $("#votes-cast").append(allCandidates[i] + ": " + votesPerCandidate[i] + "<br>");
-      }
-    });
-  });
-}
-
 function populateVendors() {
   Voting.deployed().then(function(contractInstance) {
     contractInstance.vendors().then(function(_vendors) {
@@ -111,27 +71,6 @@ function setupVendorRows() {
 
 function appendVendorRow(vendorName, vendorAddress, vendorTokenCount) {
   $("#vendor-rows").append("<tr><td>" + vendorName + "</td><td>" + vendorAddress + "</td><td>" + vendorTokenCount + "</td></tr>");
-}
-
-/* Fetch the total tokens, tokens available for sale and the price of
- * each token and display in the UI
- */
-function populateTokenData() {
-  Voting.deployed().then(function(contractInstance) {
-    contractInstance.totalTokens().then(function(v) {
-      $("#tokens-total").html(v.toString());
-    });
-    contractInstance.tokensSold.call().then(function(v) {
-      $("#tokens-sold").html(v.toString());
-    });
-    contractInstance.tokenPrice().then(function(v) {
-      tokenPrice = parseFloat(web3.utils.fromWei(v.toString()));
-      $("#token-cost").html(tokenPrice + " Ether");
-    });
-    web3.eth.getBalance(contractInstance.address, function(error, result) {
-      $("#contract-balance").html(web3.utils.fromWei(result.toString()) + " Ether");
-    });
-  });
 }
 
 $( document ).ready(function() {

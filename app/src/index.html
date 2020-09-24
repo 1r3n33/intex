@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Content Analysis Decentralized Application</title>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -10,6 +11,7 @@
     }
   </style>
 </head>
+
 <body class="container">
   <h1>Content Analysis Decentralized Application</h1>
   <div class="col-sm-7 margin-top-3">
@@ -32,10 +34,10 @@
     <div class="container-fluid">
       <h2>Add vendor</h2>
       <div id="msg-vendor"></div>
-      <input type="text" id="vendor-addr" placeholder="Enter the vendor address"/>
+      <input type="text" id="vendor-addr" placeholder="Enter the vendor address" />
       <br>
       <br>
-      <input type="text" id="vendor-name" placeholder="Enter the vendor name"/>
+      <input type="text" id="vendor-name" placeholder="Enter the vendor name" />
       <br>
       <br>
       <a href="#" onclick="addVendor()" class="btn btn-primary">Add</a>
@@ -45,63 +47,21 @@
 
     <div class="container-fluid">
       <h2>Get hash</h2>
-      <input type="text" id="gethash-addr" placeholder="Enter the vendor address"/>
+      <input type="text" id="gethash-addr" placeholder="Enter the vendor address" />
       <br>
       <br>
-      <input type="text" id="gethash-uri" placeholder="Enter the Uri"/>
+      <input type="text" id="gethash-uri" placeholder="Enter the Uri" />
       <br>
       <br>
       <a href="#" onclick="getHash()" class="btn btn-primary">Get</a>
       <div id="gethash-normalized-uri"></div>
       <div id="gethash-hash"></div>
-  </div>
+    </div>
 
   </div>
-  <div class="col-sm-offset-1 col-sm-4 margin-top-3">
-    <div class="row">
-      <h2>Token Stats</h2>
-      <div class="table-responsive">
-        <table class="table table-bordered">
-          <tr>
-            <td>Tokens For Sale</td>
-            <td id="tokens-total"></td>
-          </tr>
-          <tr>
-            <td>Tokens Sold</td>
-            <td id="tokens-sold"></td>
-          </tr>
-          <tr>
-            <td>Price Per Token</td>
-            <td id="token-cost"></td>
-          </tr>
-          <tr>
-            <td>Balance in the contract</td>
-            <td id="contract-balance"></td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    <div class="row margin-top-3">
-      <h2>Purchase Tokens</h2>
-      <div class="col-sm-12">
-        <div id="buy-msg"></div>
-        <input type="text" id="buy" class="col-sm-8" placeholder="Number of tokens to buy"/>&nbsp;
-        <a href="#" onclick="buyTokens()" class="btn btn-primary">Buy</a>
-      </div>
-    </div>
-    <div class="row margin-top-3">
-      <h2>Lookup Voter Info</h2>
-      <div class="col-sm-12">
-        <input type="text" id="voter-info", class="col-sm-8" placeholder="Enter the voter address" />&nbsp;
-        <a href="#" onclick="lookupVoterInfo()" class="btn btn-primary">Lookup</a>
-        <div class="voter-details row text-left">
-          <div id="tokens-bought" class="margin-top-3 col-md-12"></div>
-          <div id="votes-cast" class="col-md-12"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 </body>
+
 <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
 <script src="index.js"></script>
+
 </html>
