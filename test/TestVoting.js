@@ -53,4 +53,33 @@ contract('Voting', accounts => {
         assert(hasRaisedException, 'should have raised exception');
     });
 
+    it('should add content analysis', async () => {
+        let instance = await Voting.deployed();
+
+        let urlVendorHash = '0x123456789';
+        await instance.addContentAnalysis(urlVendorHash, 1, { from: accounts[1] });
+
+        let contentAnalysis = await instance.contentAnalysisByHash(urlVendorHash);
+
+        assert.equal(contentAnalysis.vendor, accounts[1], 'Invalid vendor');
+        assert.equal(contentAnalysis.iabUnsafeDigitalEnvironment, 1, 'Invalid IAB unsafe digital environment');
+    });
+
+    it('should not add content analysis', async () => {
+        let instance = await Voting.deployed();
+
+        let hasRaisedException = false;
+        try {
+            let urlVendorHash = '0x123456789';
+            await instance.addContentAnalysis(urlVendorHash, 2, { from: accounts[6] });
+        } catch (exception) {
+            assert(
+                exception.message.startsWith('Returned error: VM Exception while processing transaction: revert Sender must be vendor'),
+                'invalid exception: ' + exception.message
+            );
+            hasRaisedException = true;
+        }
+
+        assert(hasRaisedException, 'should have raised exception');
+    });
 });
