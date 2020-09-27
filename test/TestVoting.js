@@ -82,4 +82,19 @@ contract('Voting', accounts => {
 
         assert(hasRaisedException, 'should have raised exception');
     });
+
+    it('should check content analysis', async () => {
+        let instance = await Voting.deployed();
+
+        let vendor = await instance.vendorByAddress(accounts[2]);
+        assert.equal(vendor.tokenCount, 1000, 'Invalid token count: ' + vendor.tokenCount);
+
+        await instance.addContentAnalysis('0x123', 4, { from: accounts[2] });
+        vendor = await instance.vendorByAddress(accounts[2]);
+        assert.equal(vendor.tokenCount, 999, 'Invalid token count: ' + vendor.tokenCount);
+
+        await instance.checkContentAnalysis('0x456', '0x123');
+        vendor = await instance.vendorByAddress(accounts[2]);
+        assert.equal(vendor.tokenCount, 1000, 'Invalid token count: ' + vendor.tokenCount);
+    });
 });
