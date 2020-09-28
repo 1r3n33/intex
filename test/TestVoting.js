@@ -9,19 +9,21 @@ contract('Voting', accounts => {
     it('should add a single vendor', async () => {
         let instance = await Voting.deployed();
 
-        await instance.addVendor(accounts[0], web3.utils.asciiToHex('vendor'));
+        await instance.addVendor(accounts[1], web3.utils.asciiToHex('vendor1'));
         let vendors = await instance.vendors();
 
         assert.equal(vendors.length, 1, 'invalid length');
-        assert.equal(vendors[0].addr, accounts[0], 'invalid address');
-        assert.equal(vendors[0].name, web3.utils.padRight(web3.utils.asciiToHex('vendor'), 64), 'invalid name');
-        assert.equal(vendors[0].tokenCount, 1000, 'invalid token count');
+        assert.equal(vendors[0].addr, accounts[1], 'invalid address');
+        assert.equal(vendors[0].name, web3.utils.padRight(web3.utils.asciiToHex('vendor1'), 64), 'invalid name');
+
+        let balance = await instance.balanceOf(accounts[1]);
+        assert.equal(balance, web3.utils.toWei('1000000'), 'invalid token count: ' + balance);
     });
 
     it('should add multiple vendors', async () => {
         let instance = await Voting.deployed();
 
-        for (i = 1; i < 5; i++) {
+        for (i = 2; i <= 5; i++) {
             await instance.addVendor(accounts[i], web3.utils.asciiToHex('vendor'+i));
         }
 
@@ -29,10 +31,12 @@ contract('Voting', accounts => {
 
         assert.equal(vendors.length, 5, 'invalid length');
 
-        for (i = 1; i < 5; i++) {
-            assert.equal(vendors[i].addr, accounts[i], 'invalid address');
-            assert.equal(vendors[i].name, web3.utils.padRight(web3.utils.asciiToHex('vendor'+i), 64), 'invalid name');
-            assert.equal(vendors[i].tokenCount, 1000, 'invalid token count');
+        for (i = 0; i < 5; i++) {
+            assert.equal(vendors[i].addr, accounts[i+1], 'invalid address');
+            assert.equal(vendors[i].name, web3.utils.padRight(web3.utils.asciiToHex('vendor'+(i+1)), 64), 'invalid name');
+
+            let balance = await instance.balanceOf(accounts[i+1]);
+            assert.equal(balance, web3.utils.toWei('1000000'), 'invalid token count: ' + balance);
         }
     });
 
@@ -41,7 +45,7 @@ contract('Voting', accounts => {
 
         let hasRaisedException = false;
         try {
-            await instance.addVendor(accounts[0], web3.utils.asciiToHex('vendor'));
+            await instance.addVendor(accounts[1], web3.utils.asciiToHex('vendor'));
         } catch (exception) {
             assert(
                 exception.message.startsWith('Returned error: VM Exception while processing transaction: revert Vendor address already exists'),
@@ -86,15 +90,15 @@ contract('Voting', accounts => {
     it('should check content analysis', async () => {
         let instance = await Voting.deployed();
 
-        let vendor = await instance.vendorByAddress(accounts[2]);
-        assert.equal(vendor.tokenCount, 1000, 'Invalid token count: ' + vendor.tokenCount);
+        let balance = await instance.balanceOf(accounts[2]);
+        assert.equal(balance, web3.utils.toWei('1000000'), 'Invalid token count: ' + balance);
 
         await instance.addContentAnalysis('0x123', 4, { from: accounts[2] });
-        vendor = await instance.vendorByAddress(accounts[2]);
-        assert.equal(vendor.tokenCount, 999, 'Invalid token count: ' + vendor.tokenCount);
+        balance = await instance.balanceOf(accounts[2]);
+        assert.equal(balance, web3.utils.toWei('999000'), 'Invalid token count: ' + balance);
 
         await instance.checkContentAnalysis('0x456', '0x123');
-        vendor = await instance.vendorByAddress(accounts[2]);
-        assert.equal(vendor.tokenCount, 1000, 'Invalid token count: ' + vendor.tokenCount);
+        balance = await instance.balanceOf(accounts[2]);
+        assert.equal(balance, web3.utils.toWei('999100'), 'Invalid token count: ' + balance);
     });
 });

@@ -1,15 +1,15 @@
 pragma solidity ^0.7.1;
 pragma experimental ABIEncoderV2;
-// We have to specify what version of compiler this code will compile with
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "./iab/IAB.sol";
 
-contract Voting {
+contract Voting is ERC20 {
 
   struct Vendor {
     address addr;
     bytes32 name;
-    uint256 tokenCount;
   }
 
   struct ContentAnalysis {
@@ -25,6 +25,8 @@ contract Voting {
     bytes32 urlVendorHash;
   }
 
+  address public owner;
+
   address[] public vendorAddresses;
   mapping (address => Vendor) public vendorByAddress;
 
@@ -32,13 +34,27 @@ contract Voting {
 
   mapping (bytes32 => ContentVerification) public contentVerificationByHash;
 
+  constructor(uint256 initialSupply) ERC20("ContentVerificationPlatform", "CVP")
+  {
+    owner = msg.sender;
+    _mint(msg.sender, initialSupply); // By default, ERC20 uses a value of 18 for decimals. Unit is 1 * 10**18.
+  }
+
   // Add vendor.
   // Vendors are capable to call addContentAnalysis.
+  // TODO: Only contract owner can add vendor.
   function addVendor(address addr, bytes32 name) public
   {
     require(vendorByAddress[addr].addr == address(0), "Vendor address already exists");
+
+    // Register vendor.
     vendorAddresses.push(addr);
-    vendorByAddress[addr] = Vendor(addr, name, 1000);
+    vendorByAddress[addr] = Vendor(addr, name);
+
+    // Transfer One million to vendor.
+    // TODO: Should be a separate payable method in the future.
+    uint256 oneMillion = uint256(1 * (10**6) * (10**18));
+    transfer(addr, oneMillion);
   }
 
   function vendors() view public returns (Vendor[] memory)
@@ -54,10 +70,12 @@ contract Voting {
   // Add ContentAnalysis.
   function addContentAnalysis(bytes32 urlVendorHash, IAB.UnsafeDigitalEnvironment unsafeDigitalEnvironment) public
   {
+    uint256 oneThousand = uint256(1 * (10**3) * (10**18));
+
     Vendor storage vendor = vendorByAddress[msg.sender];
 
     require(vendor.addr == msg.sender, "Sender must be vendor");
-    require(vendor.tokenCount >= 1, "Unsufficient funds");
+    require(balanceOf(msg.sender) >= oneThousand, "Unsufficient funds");
 
     // Store ContentAnalysis
     contentAnalysisByHash[urlVendorHash] = ContentAnalysis(
@@ -68,7 +86,7 @@ contract Voting {
       IAB.ContentTaxonomyTier1.Unknown);
 
     // Payment
-    vendor.tokenCount = vendor.tokenCount-1;
+    transfer(owner, oneThousand);
   }
 
   // Content check
@@ -82,10 +100,7 @@ contract Voting {
       urlVendorHash);
 
     // Payment
-    vendor.tokenCount = vendor.tokenCount+1;
-  }
-
-  constructor()
-  {
+    uint256 oneHundred = uint256(1 * (10**2) * (10**18));
+    transfer(vendor.addr, oneHundred);
   }
 }
