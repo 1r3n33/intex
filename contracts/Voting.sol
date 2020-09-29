@@ -103,4 +103,22 @@ contract Voting is ERC20 {
     uint256 oneHundred = uint256(1 * (10**2) * (10**18));
     transfer(vendor.addr, oneHundred);
   }
+
+  // Reward verifier & vendor for provided service.
+  function reward(bytes32 verificationHash, uint256 rewardForVerifier, uint256 rewardForVendor) public
+  {
+    require(balanceOf(msg.sender) >= rewardForVerifier+rewardForVendor, "Unsufficient funds");
+
+    // Reward verifier
+    ContentVerification memory contentVerification = contentVerificationByHash[verificationHash];
+    require(contentVerification.verifier != address(0), "Cannot find verifier");
+
+    transfer(contentVerification.verifier, rewardForVerifier);
+
+    // Reward vendor
+    ContentAnalysis memory contentAnalysis = contentAnalysisByHash[contentVerification.urlVendorHash];
+    require(contentAnalysis.vendor != address(0), "Cannot find vendor");
+
+    transfer(contentAnalysis.vendor, rewardForVendor);
+  }
 }

@@ -17,7 +17,7 @@ contract('Voting', accounts => {
         assert.equal(vendors[0].name, web3.utils.padRight(web3.utils.asciiToHex('vendor1'), 64), 'invalid name');
 
         let balance = await instance.balanceOf(accounts[1]);
-        assert.equal(balance, web3.utils.toWei('1000000'), 'invalid token count: ' + balance);
+        assert.equal(balance, web3.utils.toWei('1000000'), 'invalid balance: ' + balance);
     });
 
     it('should add multiple vendors', async () => {
@@ -36,7 +36,7 @@ contract('Voting', accounts => {
             assert.equal(vendors[i].name, web3.utils.padRight(web3.utils.asciiToHex('vendor'+(i+1)), 64), 'invalid name');
 
             let balance = await instance.balanceOf(accounts[i+1]);
-            assert.equal(balance, web3.utils.toWei('1000000'), 'invalid token count: ' + balance);
+            assert.equal(balance, web3.utils.toWei('1000000'), 'invalid balance: ' + balance);
         }
     });
 
@@ -91,14 +91,43 @@ contract('Voting', accounts => {
         let instance = await Voting.deployed();
 
         let balance = await instance.balanceOf(accounts[2]);
-        assert.equal(balance, web3.utils.toWei('1000000'), 'Invalid token count: ' + balance);
+        assert.equal(balance, web3.utils.toWei('1000000'), 'Invalid balance: ' + balance);
 
         await instance.addContentAnalysis('0x123', 4, { from: accounts[2] });
         balance = await instance.balanceOf(accounts[2]);
-        assert.equal(balance, web3.utils.toWei('999000'), 'Invalid token count: ' + balance);
+        assert.equal(balance, web3.utils.toWei('999000'), 'Invalid balance: ' + balance);
 
         await instance.checkContentAnalysis('0x456', '0x123');
         balance = await instance.balanceOf(accounts[2]);
-        assert.equal(balance, web3.utils.toWei('999100'), 'Invalid token count: ' + balance);
+        assert.equal(balance, web3.utils.toWei('999100'), 'Invalid balance: ' + balance);
+    });
+
+    it('should reward good players', async () => {
+        let instance = await Voting.deployed();
+
+        let rewarderPreviousBalance = await instance.balanceOf(accounts[1]);
+        let verifierPreviousBalance = await instance.balanceOf(accounts[0]);
+        let vendorPreviousBalance = await instance.balanceOf(accounts[2]);
+
+        await instance.reward('0x456', web3.utils.toWei('50'), web3.utils.toWei('10'), { from: accounts[1] });
+
+        let rewarderNewBalance = await instance.balanceOf(accounts[1]);
+        let verifierNewBalance = await instance.balanceOf(accounts[0]);
+        let vendorNewBalance = await instance.balanceOf(accounts[2]);
+
+        assert.equal(
+            rewarderPreviousBalance.sub(new web3.utils.BN(web3.utils.toWei('60'))).toString(),
+            rewarderNewBalance.toString(),
+            'Invalid rewarder balance');
+
+        assert.equal(
+            verifierPreviousBalance.add(new web3.utils.BN(web3.utils.toWei('50'))).toString(),
+            verifierNewBalance.toString(),
+            'Invalid verifier balance');
+
+        assert.equal(
+            vendorPreviousBalance.add(new web3.utils.BN(web3.utils.toWei('10'))).toString(),
+            vendorNewBalance.toString(),
+            'Invalid vendor balance');
     });
 });
