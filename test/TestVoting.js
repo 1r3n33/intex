@@ -2,8 +2,11 @@ const Voting = artifacts.require('Voting');
 
 contract('Voting', accounts => {
 
-    it('should pass', async () => {
-        assert.equal(true, true, 'always passing test');
+    it('should deploy with expected balance', async () => {
+        let instance = await Voting.deployed();
+
+        let balance = await instance.balanceOf(accounts[0]);
+        assert.equal(balance, web3.utils.toWei('1000000000'), 'invalid balance: ' + balance);
     });
 
     it('should add a single vendor', async () => {
