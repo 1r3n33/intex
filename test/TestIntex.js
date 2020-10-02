@@ -1,16 +1,16 @@
-const Voting = artifacts.require('Voting');
+const Intex = artifacts.require('Intex');
 
-contract('Voting', accounts => {
+contract('Intex', accounts => {
 
     it('should deploy with expected balance', async () => {
-        let instance = await Voting.deployed();
+        let instance = await Intex.deployed();
 
         let balance = await instance.balanceOf(accounts[0]);
         assert.equal(balance, web3.utils.toWei('1000000000'), 'invalid balance: ' + balance);
     });
 
     it('should add a single vendor', async () => {
-        let instance = await Voting.deployed();
+        let instance = await Intex.deployed();
 
         await instance.addVendor(accounts[1], web3.utils.asciiToHex('vendor1'));
         let vendors = await instance.vendors();
@@ -24,7 +24,7 @@ contract('Voting', accounts => {
     });
 
     it('should add multiple vendors', async () => {
-        let instance = await Voting.deployed();
+        let instance = await Intex.deployed();
 
         for (i = 2; i <= 5; i++) {
             await instance.addVendor(accounts[i], web3.utils.asciiToHex('vendor'+i));
@@ -44,7 +44,7 @@ contract('Voting', accounts => {
     });
 
     it('should not add the same vendor twice', async () => {
-        let instance = await Voting.deployed();
+        let instance = await Intex.deployed();
 
         let hasRaisedException = false;
         try {
@@ -61,7 +61,7 @@ contract('Voting', accounts => {
     });
 
     it('should add content analysis', async () => {
-        let instance = await Voting.deployed();
+        let instance = await Intex.deployed();
 
         let urlVendorHash = '0x123456789';
         await instance.addContentAnalysis(urlVendorHash, 1, { from: accounts[1] });
@@ -73,7 +73,7 @@ contract('Voting', accounts => {
     });
 
     it('should not add content analysis', async () => {
-        let instance = await Voting.deployed();
+        let instance = await Intex.deployed();
 
         let hasRaisedException = false;
         try {
@@ -91,7 +91,7 @@ contract('Voting', accounts => {
     });
 
     it('should check content analysis', async () => {
-        let instance = await Voting.deployed();
+        let instance = await Intex.deployed();
 
         let balance = await instance.balanceOf(accounts[2]);
         assert.equal(balance, web3.utils.toWei('1000000'), 'Invalid balance: ' + balance);
@@ -106,7 +106,7 @@ contract('Voting', accounts => {
     });
 
     it('should reward good players', async () => {
-        let instance = await Voting.deployed();
+        let instance = await Intex.deployed();
 
         let rewarderPreviousBalance = await instance.balanceOf(accounts[1]);
         let verifierPreviousBalance = await instance.balanceOf(accounts[0]);

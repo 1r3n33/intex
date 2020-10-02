@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "./iab/IAB.sol";
 
-contract Voting is ERC20 {
+contract Intex is ERC20 {
 
   struct Vendor {
     address addr;
@@ -34,7 +34,7 @@ contract Voting is ERC20 {
 
   mapping (bytes32 => ContentVerification) public contentVerificationByHash;
 
-  constructor(uint256 initialSupply) ERC20("ContentVerificationPlatform", "CVP")
+  constructor(uint256 initialSupply) ERC20("IntelligenceExchange", "INTX")
   {
     owner = msg.sender;
     _mint(msg.sender, initialSupply); // By default, ERC20 uses a value of 18 for decimals. Unit is 1 * 10**18.

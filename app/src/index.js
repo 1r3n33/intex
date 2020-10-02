@@ -7,18 +7,16 @@ import { default as contract } from '@truffle/contract'
 import { default as normalizeUrl } from 'normalize-url'
 
 /*
- * When you compile and deploy your Voting contract,
+ * When you compile and deploy your Intex contract,
  * truffle stores the abi and deployed address in a json
  * file in the build directory. We will use this information
- * to setup a Voting abstraction. We will use this abstraction
- * later to create an instance of the Voting contract.
- * Compare this against the index.js from our previous tutorial to see the difference
- * https://gist.github.com/maheshmurthy/f6e96d6b3fff4cd4fa7f892de8a1a1b4#file-index-js
+ * to setup a Intex abstraction. We will use this abstraction
+ * later to create an instance of the Intex contract.
  */
 
-import voting_artifacts from '../../build/contracts/Voting.json'
+import intex_artifacts from '../../build/contracts/Intex.json'
 
-var Voting = contract(voting_artifacts);
+var Intex = contract(intex_artifacts);
 
 let vendors = {}
 
@@ -27,7 +25,7 @@ window.addVendor = function(vendor) {
   let vendorName = $("#vendor-name").val();
   $("#msg-vendor").html("Adding vendor request has been submitted. The vendor will be added as soon as the operation is recorded on the blockchain. Please wait.")
 
-  Voting.deployed().then(function(contractInstance) {
+  Intex.deployed().then(function(contractInstance) {
     web3.eth.getAccounts().then(function(accounts) {
       contractInstance.addVendor(vendorAddress, web3.utils.asciiToHex(vendorName), {from: accounts[0]}).then(function() {
         $("#msg-vendor").html("");
@@ -52,7 +50,7 @@ window.getHash = function(hash) {
 }
 
 function populateVendors() {
-  Voting.deployed().then(function(contractInstance) {
+  Intex.deployed().then(function(contractInstance) {
     contractInstance.vendors().then(function(_vendors) {
       for(let i=0; i < _vendors.length; i++) {
         let name = web3.utils.toUtf8(_vendors[i]['name'])
@@ -84,6 +82,6 @@ $( document ).ready(function() {
     window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
   }
 
-  Voting.setProvider(web3.currentProvider);
+  Intex.setProvider(web3.currentProvider);
   populateVendors();
 });
