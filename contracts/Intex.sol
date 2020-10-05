@@ -40,6 +40,21 @@ contract Intex is ERC20 {
     _mint(msg.sender, initialSupply); // By default, ERC20 uses a value of 18 for decimals. Unit is 1 * 10**18.
   }
 
+  // Get INTX tokens in exchange of ETH
+  function getTokens() public payable
+  {
+    uint256 exchangeRate = uint256(10**6); // 1 ETH -> 1M INTEX tokens
+    uint256 tokens = msg.value * exchangeRate;
+    _mint(msg.sender, tokens);
+  }
+
+  // Owner can widraw ETH and transfer to beneficiary
+  function withdraw(address payable beneficiary, uint256 amount) public
+  {
+    require(msg.sender == owner);
+    beneficiary.transfer(amount);
+  }
+
   // Add vendor.
   // Vendors are capable to call addContentAnalysis.
   // TODO: Only contract owner can add vendor.
