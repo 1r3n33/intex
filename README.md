@@ -8,7 +8,7 @@ Powered by the Ethereum Blockchain.
 
 # Use cases
 
-## Adverstising
+## Advertising
 
 **Brand Safety**
 
