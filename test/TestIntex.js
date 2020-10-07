@@ -48,59 +48,10 @@ contract('Intex', accounts => {
         assert.deepStrictEqual(diff.toString(), expected.toString(), 'Invalid ETH balance');
     });
 
-    it('should add a single vendor', async () => {
+    it('should add content analysis', async () => {
         let instance = await Intex.deployed();
 
         await instance.addVendor(accounts[1], web3.utils.asciiToHex('vendor1'));
-        let vendors = await instance.vendors();
-
-        assert.equal(vendors.length, 1, 'invalid length');
-        assert.equal(vendors[0].addr, accounts[1], 'invalid address');
-        assert.equal(vendors[0].name, web3.utils.padRight(web3.utils.asciiToHex('vendor1'), 64), 'invalid name');
-
-        let balance = await instance.balanceOf(accounts[1]);
-        assert.equal(balance, web3.utils.toWei('1000000'), 'invalid balance: ' + balance);
-    });
-
-    it('should add multiple vendors', async () => {
-        let instance = await Intex.deployed();
-
-        for (i = 2; i <= 5; i++) {
-            await instance.addVendor(accounts[i], web3.utils.asciiToHex('vendor'+i));
-        }
-
-        let vendors = await instance.vendors();
-
-        assert.equal(vendors.length, 5, 'invalid length');
-
-        for (i = 0; i < 5; i++) {
-            assert.equal(vendors[i].addr, accounts[i+1], 'invalid address');
-            assert.equal(vendors[i].name, web3.utils.padRight(web3.utils.asciiToHex('vendor'+(i+1)), 64), 'invalid name');
-
-            let balance = await instance.balanceOf(accounts[i+1]);
-            assert.equal(balance, web3.utils.toWei('1000000'), 'invalid balance: ' + balance);
-        }
-    });
-
-    it('should not add the same vendor twice', async () => {
-        let instance = await Intex.deployed();
-
-        let hasRaisedException = false;
-        try {
-            await instance.addVendor(accounts[1], web3.utils.asciiToHex('vendor'));
-        } catch (exception) {
-            assert(
-                exception.message.startsWith('Returned error: VM Exception while processing transaction: revert Vendor address already exists'),
-                'invalid exception: ' + exception.message
-            );
-            hasRaisedException = true;
-        }
-
-        assert(hasRaisedException, 'should have raised exception');
-    });
-
-    it('should add content analysis', async () => {
-        let instance = await Intex.deployed();
 
         let urlVendorHash = '0x123456789';
         await instance.addContentAnalysis(urlVendorHash, 1, { from: accounts[1] });
@@ -131,6 +82,8 @@ contract('Intex', accounts => {
 
     it('should check content analysis', async () => {
         let instance = await Intex.deployed();
+
+        await instance.addVendor(accounts[2], web3.utils.asciiToHex('vendor2'));
 
         let balance = await instance.balanceOf(accounts[2]);
         assert.equal(balance, web3.utils.toWei('1000000'), 'Invalid balance: ' + balance);

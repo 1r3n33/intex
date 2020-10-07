@@ -30,7 +30,7 @@ contract Exchange {
     /// @dev Register as provider
     function registerAsProvider(bytes32 name) public
     {
-        require(providerByAddress[msg.sender].addr == address(0), "Provider already exists");
+        require(providerByAddress[msg.sender].addr == address(0), "Provider address already registered");
 
         // Register provider
         providerAddresses.push(msg.sender);

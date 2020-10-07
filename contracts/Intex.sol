@@ -55,9 +55,7 @@ contract Intex is ERC20 {
     beneficiary.transfer(amount);
   }
 
-  // Add vendor.
-  // Vendors are capable to call addContentAnalysis.
-  // TODO: Only contract owner can add vendor.
+  /// @dev Used for tests. To be removed when Content Analysis methods will be moved to the Exchange contract.
   function addVendor(address addr, bytes32 name) public
   {
     require(vendorByAddress[addr].addr == address(0), "Vendor address already exists");
@@ -67,19 +65,8 @@ contract Intex is ERC20 {
     vendorByAddress[addr] = Vendor(addr, name);
 
     // Transfer One million to vendor.
-    // TODO: Should be a separate payable method in the future.
     uint256 oneMillion = uint256(1 * (10**6) * (10**18));
     transfer(addr, oneMillion);
-  }
-
-  function vendors() view public returns (Vendor[] memory)
-  {
-    Vendor[] memory _vendors = new Vendor[](vendorAddresses.length);
-    for (uint i=0; i<vendorAddresses.length; i++)
-    {
-      _vendors[i] = vendorByAddress[vendorAddresses[i]];
-    }
-    return _vendors;
   }
 
   // Add ContentAnalysis.
