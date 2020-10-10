@@ -48,20 +48,6 @@ contract('Intex', accounts => {
         assert.deepStrictEqual(diff.toString(), expected.toString(), 'Invalid ETH balance');
     });
 
-    it('should add content analysis', async () => {
-        let instance = await Intex.deployed();
-
-        await instance.addVendor(accounts[1], web3.utils.asciiToHex('vendor1'));
-
-        let urlVendorHash = '0x123456789';
-        await instance.addContentAnalysis(urlVendorHash, 1, { from: accounts[1] });
-
-        let contentAnalysis = await instance.contentAnalysisByHash(urlVendorHash);
-
-        assert.equal(contentAnalysis.vendor, accounts[1], 'Invalid vendor');
-        assert.equal(contentAnalysis.iabUnsafeDigitalEnvironment, 1, 'Invalid IAB unsafe digital environment');
-    });
-
     it('should not add content analysis', async () => {
         let instance = await Intex.deployed();
 
@@ -99,6 +85,8 @@ contract('Intex', accounts => {
 
     it('should reward good players', async () => {
         let instance = await Intex.deployed();
+
+        await instance.addVendor(accounts[1], web3.utils.asciiToHex('vendor1'));
 
         let rewarderPreviousBalance = await instance.balanceOf(accounts[1]);
         let verifierPreviousBalance = await instance.balanceOf(accounts[0]);
