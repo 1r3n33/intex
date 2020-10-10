@@ -9,8 +9,8 @@
   "dependencies": {},
   "devDependencies": {
     "@openzeppelin/contracts": "^3.2.1-solc-0.7",
-    "solc": "^0.7.1",
-    "truffle": "^5.1.46"
+    "solc": "^0.7.3",
+    "truffle": "^5.1.48"
   },
   "scripts": {
     "test": "truffle test"
