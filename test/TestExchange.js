@@ -71,4 +71,26 @@ contract('Exchange', accounts => {
         assert.equal(dataIntelligence.format, 1, 'Invalid format');
         assert.equal(dataIntelligence.data, web3.utils.asciiToHex('bytes'), 'Invalid data');
     });
+
+    it('should not add data intelligence', async () => {
+        const exchange = await Exchange.deployed();
+
+        let hasRaisedException = false;
+        try {
+            const hash = '0x123456789';
+            const type = 0;
+            const format = 1;
+            const bytes = web3.utils.asciiToHex('bytes');
+
+            await exchange.addDataIntelligence(hash, type, format, bytes, { from: accounts[9] });
+        } catch (exception) {
+            assert(
+                exception.message.startsWith('Returned error: VM Exception while processing transaction: revert Sender must be provider'),
+                'invalid exception: ' + exception.message
+            );
+            hasRaisedException = true;
+        }
+
+        assert(hasRaisedException, 'should have raised exception');
+    });
 });

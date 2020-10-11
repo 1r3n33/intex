@@ -48,24 +48,6 @@ contract('Intex', accounts => {
         assert.deepStrictEqual(diff.toString(), expected.toString(), 'Invalid ETH balance');
     });
 
-    it('should not add content analysis', async () => {
-        let instance = await Intex.deployed();
-
-        let hasRaisedException = false;
-        try {
-            let urlVendorHash = '0x123456789';
-            await instance.addContentAnalysis(urlVendorHash, 2, { from: accounts[6] });
-        } catch (exception) {
-            assert(
-                exception.message.startsWith('Returned error: VM Exception while processing transaction: revert Sender must be vendor'),
-                'invalid exception: ' + exception.message
-            );
-            hasRaisedException = true;
-        }
-
-        assert(hasRaisedException, 'should have raised exception');
-    });
-
     it('should check content analysis', async () => {
         let instance = await Intex.deployed();
 
