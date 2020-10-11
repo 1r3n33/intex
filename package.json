@@ -1,5 +1,5 @@
 {
-  "name": "adchain",
+  "name": "intex",
   "version": "1.0.0",
   "description": "",
   "main": "",
@@ -17,12 +17,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/1r3n33/adchain.git"
+    "url": "git+https://github.com/1r3n33/intex.git"
   },
   "author": "1r3n33",
   "license": "",
   "bugs": {
-    "url": "https://github.com/1r3n33/adchain/issues"
+    "url": "https://github.com/1r3n33/intex/issues"
   },
-  "homepage": "https://github.com/1r3n33/adchain"
+  "homepage": "https://github.com/1r3n33/intex"
 }
