@@ -57,7 +57,7 @@ contract('Exchange', accounts => {
         // Allow Exchange to use 1K INTX tokens
         await intex.increaseAllowance(exchange.address, web3.utils.toWei('1000'), { from: accounts[1] });
 
-        const hash = '0x123456789';
+        const hash = '0x0123456789';
         const type = 0;
         const format = 1;
         const bytes = web3.utils.asciiToHex('bytes');
@@ -77,7 +77,7 @@ contract('Exchange', accounts => {
 
         let hasRaisedException = false;
         try {
-            const hash = '0x123456789';
+            const hash = '0x0123456789';
             const type = 0;
             const format = 1;
             const bytes = web3.utils.asciiToHex('bytes');
@@ -92,5 +92,34 @@ contract('Exchange', accounts => {
         }
 
         assert(hasRaisedException, 'should have raised exception');
+    });
+
+    it('should check data intelligence', async () => {
+        const intex = await Intex.deployed();
+        const exchange = await Exchange.deployed();
+
+        // Buy 1M Intex tokens
+        await intex.getTokens({ from: accounts[2], value: web3.utils.toWei('1') });
+        // Allow Exchange to use 1K INTX tokens
+        await intex.increaseAllowance(exchange.address, web3.utils.toWei('1000'), { from: accounts[2] });
+
+        const dataHash = '0x0123456789';
+        const type = 0;
+        const format = 1;
+        const bytes = web3.utils.asciiToHex('bytes');
+        await exchange.addDataIntelligence(dataHash, type, format, bytes, { from: accounts[2] });
+
+        // Buy 1M Intex tokens
+        await intex.getTokens({ from: accounts[3], value: web3.utils.toWei('1') });
+        // Allow Exchange to use 1K INTX tokens
+        await intex.increaseAllowance(exchange.address, web3.utils.toWei('100'), { from: accounts[3] });
+
+        const checkHash = '0x9876543210';
+        await exchange.checkDataIntelligence(checkHash, dataHash, { from: accounts[3] });
+
+        const dataIntelligenceCheck = await exchange.checkByHash(checkHash);
+
+        assert.equal(dataIntelligenceCheck.checker, accounts[3], 'Invalid checker');
+        assert.equal(dataIntelligenceCheck.dataHash, web3.utils.padRight(dataHash, 64), 'Invalid data hash');
     });
 });

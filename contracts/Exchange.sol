@@ -30,6 +30,13 @@ contract Exchange {
     }
     mapping (bytes32 => DataIntelligence) public dataByHash;
 
+    struct DataIntelligenceCheck {
+        address checker;
+        uint256 timestamp;
+        bytes32 dataHash;
+    }
+    mapping (bytes32 => DataIntelligenceCheck) public checkByHash;
+
     /// @dev Pass the Intex Token contract address
     constructor(Intex _token)
     {
@@ -76,5 +83,17 @@ contract Exchange {
         // Payment
         // Tokens do not burn, they are sent to owner!
         token.transferFrom(msg.sender, owner, oneThousand);
+    }
+
+    /// @dev Check Data Intelligence
+    function checkDataIntelligence(bytes32 checkHash, bytes32 dataHash) external
+    {
+        DataIntelligence memory dataIntelligence = dataByHash[dataHash];
+
+        checkByHash[checkHash] = DataIntelligenceCheck(msg.sender, block.timestamp, dataHash);
+
+        // Payment
+        uint256 oneHundred = uint256(1 * (10**2) * (10**18));
+        token.transferFrom(msg.sender, dataIntelligence.provider, oneHundred);
     }
 }
