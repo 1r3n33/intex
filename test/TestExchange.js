@@ -111,7 +111,7 @@ contract('Exchange', accounts => {
 
         // Buy 1M Intex tokens
         await intex.getTokens({ from: accounts[3], value: web3.utils.toWei('1') });
-        // Allow Exchange to use 1K INTX tokens
+        // Allow Exchange to use 100 INTX tokens
         await intex.increaseAllowance(exchange.address, web3.utils.toWei('100'), { from: accounts[3] });
 
         const checkHash = '0x9876543210';
@@ -121,5 +121,45 @@ contract('Exchange', accounts => {
 
         assert.equal(dataIntelligenceCheck.checker, accounts[3], 'Invalid checker');
         assert.equal(dataIntelligenceCheck.dataHash, web3.utils.padRight(dataHash, 64), 'Invalid data hash');
+    });
+
+    it('should reward checker and provider', async () => {
+        const intex = await Intex.deployed();
+        const exchange = await Exchange.deployed();
+
+        const providerReward = web3.utils.toWei('50');
+        const checkerReward = web3.utils.toWei('10');
+        const totalReward = web3.utils.toWei('60');
+
+        // Buy 1M Intex tokens
+        await intex.getTokens({ from: accounts[4], value: web3.utils.toWei('1') });
+        // Allow Exchange to use 60 INTX tokens
+        await intex.increaseAllowance(exchange.address, totalReward, { from: accounts[4] });
+
+        // reusing the previous 'should check data intelligence' test
+        const providerPrev = await intex.balanceOf(accounts[2]);
+        const checkerPrev = await intex.balanceOf(accounts[3]);
+        const rewarderPrev = await intex.balanceOf(accounts[4]);
+
+        await exchange.reward('0x9876543210', providerReward, checkerReward, { from: accounts[4] });
+
+        const providerCur = await intex.balanceOf(accounts[2]);
+        const checkerCur = await intex.balanceOf(accounts[3]);
+        const rewarderCur = await intex.balanceOf(accounts[4]);
+
+        assert.equal(
+            providerPrev.add(web3.utils.toBN(providerReward)).toString(),
+            providerCur.toString(),
+            'Invalid provider balance');
+
+        assert.equal(
+            checkerPrev.add(web3.utils.toBN(checkerReward)).toString(),
+            checkerCur.toString(),
+            'Invalid checker balance');
+
+        assert.equal(
+            rewarderPrev.sub(web3.utils.toBN(totalReward)).toString(),
+            rewarderCur.toString(),
+            'Invalid rewarder balance');
     });
 });

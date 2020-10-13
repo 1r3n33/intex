@@ -96,4 +96,22 @@ contract Exchange {
         uint256 oneHundred = uint256(1 * (10**2) * (10**18));
         token.transferFrom(msg.sender, dataIntelligence.provider, oneHundred);
     }
+
+    /// @dev Reward checker & provider for service
+    function reward(bytes32 checkHash, uint256 providerReward, uint256 checkerReward) public
+    {
+        require(token.balanceOf(msg.sender) >= providerReward+checkerReward, "Unsufficient funds");
+
+        // Reward checker
+        DataIntelligenceCheck memory dataIntelligenceCheck = checkByHash[checkHash];
+        require(dataIntelligenceCheck.checker != address(0), "Cannot find checker");
+
+        token.transferFrom(msg.sender, dataIntelligenceCheck.checker, checkerReward);
+
+        // Reward provider
+        DataIntelligence memory dataIntelligence = dataByHash[dataIntelligenceCheck.dataHash];
+        require(dataIntelligence.provider != address(0), "Cannot find provider");
+
+        token.transferFrom(msg.sender, dataIntelligence.provider, providerReward);
+    }
 }
