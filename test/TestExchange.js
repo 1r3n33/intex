@@ -4,10 +4,10 @@ const Exchange = artifacts.require('Exchange');
 contract('Exchange', accounts => {
 
     it('should register a single provider', async () => {
-        let instance = await Exchange.deployed();
+        const instance = await Exchange.deployed();
 
         await instance.registerAsProvider(web3.utils.asciiToHex('provider1'), { from: accounts[1] } );
-        let providers = await instance.getAllProviders();
+        const providers = await instance.getAllProviders();
 
         assert.equal(providers.length, 1, 'invalid length');
         assert.equal(providers[0].addr, accounts[1], 'invalid address');
@@ -15,13 +15,13 @@ contract('Exchange', accounts => {
     });
 
     it('should register multiple providers', async () => {
-        let instance = await Exchange.deployed();
+        const instance = await Exchange.deployed();
 
         for (i = 2; i <= 5; i++) {
             await instance.registerAsProvider(web3.utils.asciiToHex('provider'+i), { from: accounts[i] } );
         }
 
-        let providers = await instance.getAllProviders();
+        const providers = await instance.getAllProviders();
 
         assert.equal(providers.length, 5, 'invalid length');
 
@@ -32,7 +32,7 @@ contract('Exchange', accounts => {
     });
 
     it('should not register the same provider twice', async () => {
-        let instance = await Exchange.deployed();
+        const instance = await Exchange.deployed();
 
         let hasRaisedException = false;
         try {
