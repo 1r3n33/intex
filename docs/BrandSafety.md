@@ -12,25 +12,25 @@
 
 ### For Brand Safety Providers
 
-1. Register self as Brand Safety Provider
+1. Registering self as Brand Safety Provider
 
     In order to offer Brand Safety Intelligence on Intex Exchange, you must first be registered as Brand Safety Provider by using the Intex Exchange smart contract.
 
     ```javascript
     const Exchange = artifacts.require('Exchange');
     const exchange = await Exchange.deployed();
-    
+
     await exchange.registerAsProvider(
         web3.utils.asciiToHex('provider_name'), // Provider Name must be less than 32 characters long
         {
             from: provider_account // Provider Ethereum Account address
-        }); 
+        });
     ```
 
-2. Acquiring INTX tokens
+2. Acquiring Intex tokens (INTX)
 
     Once you are registered as Brand Safety, you need to acquire Intex tokens (INTX) to use the exchange. Operations, such as adding Brand Safety Intelligence, require spending Intex tokens.
-    
+
     The Exchange smart contract pays Brand Safety Providers back every time Ad Tech companies consumes Brand Safety Intelligence to validate their operations (such as bid request).
 
     Intex tokens (INTX) are acquired by paying ETH to the Intex smart contract. The amount of Intex tokens (INTX) you get is proportional to the amount of ETH you pay.
@@ -38,14 +38,27 @@
     ```javascript
     const Intex = artifacts.require('Intex');
     const intex = await Intex.deployed();
-    
+
     await intex.getTokens(
-        { 
+        {
             from: provider_account, // Provider Ethereum Account address
             value: web3.utils.toWei('1') // Amount of ETH to spend
         });
     ```
 
+    Before storing Brand Safety Intelligence on Intex exchange, you must allow the Exchange smart contract to use Intex tokens (INTX) you acquired.
+
+    ```javascript
+    await intex.increaseAllowance(
+        exchange.address, // Intex Exchange smart contract address
+        web3.utils.toWei('1000'), // Amount of Intex tokens (INTX) the Exchange smart contract is allowed to spend on your behalf
+        {
+            from: provider_account // Provider Ethereum Account address
+        });
+    ```
+
+    The `increaseAllowance` method does not decrease your Intex tokens (INTX) balance.
+    
 3. Storing Brand Safety Intelligence
 
 4. Receiving INTX tokens
