@@ -6,6 +6,8 @@ Marketplace to connect Data Intelligence providers, consumers, auditors...
 
 Powered by the Ethereum Blockchain.
 
+![Node.js CI](https://github.com/1r3n33/intex/workflows/Node.js%20CI/badge.svg)
+
 # Use cases
 
 ## Advertising
