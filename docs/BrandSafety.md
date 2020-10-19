@@ -58,8 +58,34 @@
     ```
 
     The `increaseAllowance` method does not decrease your Intex tokens (INTX) balance.
-    
+
 3. Storing Brand Safety Intelligence
+
+    Let's consider, as a Brand Safety Provider, you would like to store a list of [IAB Brand Safety Taxonomy](#iab) ids corresponding to the content of a given website.
+    You should follow the following steps:
+
+    1. Encoding the list of `type` [IAB Brand Safety Taxonomy](#iab) ids into `bytes` using a specific `format`
+    2. Computing the `hash` of the website URL as a key to the `bytes`
+    3. Calling an Intex Exchange smart contract method to write all these information on the blockchain
+
+    The most simple format you can use to encode a type of list of ids into bytes is the following:
+
+    |Number of ids|Id 0     |Id 1     |Id 2     |...|Id *n*   |
+    |:-----------:|:-------:|:-------:|:-------:|:-:|:-------:|
+    |*4 bytes*    |*4 bytes*|*4 bytes*|*4 bytes*|...|*4 bytes*|
+
+    ```javascript
+    // Javascript code that encodes into an array of integers
+    ```
+
+    In the Intex Exchange smart contract, this format is named `Array of integers` and has `format id`: *TBD*.
+
+    To compute the hash of the website URL, you must first make sure the URL is properly [normalized](#url).
+    Then you can compute hash with the `web3.utils.keccak256` method.
+
+    ```javascript
+    // Javascript code that normalizes URL and computes hash
+    ```
 
 4. Receiving INTX tokens
 
@@ -71,8 +97,10 @@
 
 ## Appendix
 
+<a name="iab"></a>
 ### IAB Brand Safety Categories & Taxonomy
 
+<a name="url"></a>
 ### URL Normalization
 
 ### Real-time application
