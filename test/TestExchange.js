@@ -64,7 +64,7 @@ contract('Exchange', accounts => {
 
         await exchange.addDataIntelligence(hash, type, format, bytes, { from: accounts[1] });
 
-        const dataIntelligence = await exchange.dataByHash(hash);
+        const dataIntelligence = await exchange.dataByHash(accounts[1], hash);
 
         assert.equal(dataIntelligence.provider, accounts[1], 'Invalid provider');
         assert.equal(dataIntelligence.type_, 0, 'Invalid type');
@@ -115,11 +115,12 @@ contract('Exchange', accounts => {
         await intex.increaseAllowance(exchange.address, web3.utils.toWei('100'), { from: accounts[3] });
 
         const checkHash = '0x9876543210';
-        await exchange.checkDataIntelligence(checkHash, dataHash, { from: accounts[3] });
+        await exchange.checkDataIntelligence(checkHash, accounts[2], dataHash, { from: accounts[3] });
 
         const dataIntelligenceCheck = await exchange.checkByHash(checkHash);
 
         assert.equal(dataIntelligenceCheck.checker, accounts[3], 'Invalid checker');
+        assert.equal(dataIntelligenceCheck.provider, accounts[2], 'Invalid provider');
         assert.equal(dataIntelligenceCheck.dataHash, web3.utils.padRight(dataHash, 64), 'Invalid data hash');
     });
 

@@ -28,11 +28,13 @@ contract Exchange {
         uint256 format;
         bytes data;
     }
-    mapping (bytes32 => DataIntelligence) public dataByHash;
+    /// @dev Data Intelligence is stored in a data by hash mapping that is unique to each provider.
+    mapping (address => mapping (bytes32 => DataIntelligence)) public dataByHash;
 
     struct DataIntelligenceCheck {
         address checker;
         uint256 timestamp;
+        address provider;
         bytes32 dataHash;
     }
     mapping (bytes32 => DataIntelligenceCheck) public checkByHash;
@@ -77,8 +79,7 @@ contract Exchange {
         require(token.balanceOf(msg.sender) >= oneThousand, "Unsufficient funds");
 
         // Store Data Intelligence
-        // TODO: Do no let providers override each other!
-        dataByHash[_hash] = DataIntelligence(msg.sender, block.timestamp, _type, _format, _data);
+        dataByHash[msg.sender][_hash] = DataIntelligence(msg.sender, block.timestamp, _type, _format, _data);
 
         // Payment
         // Tokens do not burn, they are sent to owner!
@@ -86,11 +87,11 @@ contract Exchange {
     }
 
     /// @dev Check Data Intelligence
-    function checkDataIntelligence(bytes32 checkHash, bytes32 dataHash) external
+    function checkDataIntelligence(bytes32 checkHash, address provider, bytes32 dataHash) external
     {
-        DataIntelligence memory dataIntelligence = dataByHash[dataHash];
+        DataIntelligence memory dataIntelligence = dataByHash[provider][dataHash];
 
-        checkByHash[checkHash] = DataIntelligenceCheck(msg.sender, block.timestamp, dataHash);
+        checkByHash[checkHash] = DataIntelligenceCheck(msg.sender, block.timestamp, provider, dataHash);
 
         // Payment
         uint256 oneHundred = uint256(1 * (10**2) * (10**18));
@@ -109,7 +110,7 @@ contract Exchange {
         token.transferFrom(msg.sender, dataIntelligenceCheck.checker, checkerReward);
 
         // Reward provider
-        DataIntelligence memory dataIntelligence = dataByHash[dataIntelligenceCheck.dataHash];
+        DataIntelligence memory dataIntelligence = dataByHash[dataIntelligenceCheck.provider][dataIntelligenceCheck.dataHash];
         require(dataIntelligence.provider != address(0), "Cannot find provider");
 
         token.transferFrom(msg.sender, dataIntelligence.provider, providerReward);
