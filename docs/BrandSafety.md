@@ -61,10 +61,10 @@
 
 3. Storing Brand Safety Intelligence
 
-    Let's consider, as a Brand Safety Provider, you would like to store a list of [IAB Brand Safety Taxonomy](#iab) ids corresponding to the content of a given website.
+    Let's consider, as a Brand Safety Provider, you would like to store a list of [IAB Brand Safety Unsafe Categories](#iab) ids corresponding to unsafe content of a given website.
     You should follow the following steps:
 
-    1. Encoding the list of `type` [IAB Brand Safety Taxonomy](#iab) ids into `bytes` using a specific `format`
+    1. Encoding the list of `type` [IAB Brand Safety Unsafe Categories](#iab) ids into `bytes` using a specific `format`
     2. Computing the `hash` of the website URL as a key to the `bytes`
     3. Calling an Intex Exchange smart contract method to write all these information on the blockchain
 
@@ -84,7 +84,11 @@
     Then you can compute hash with the `web3.utils.keccak256` method.
 
     ```javascript
-    // Javascript code that normalizes URL and computes hash
+    import { default as Web3} from 'web3';
+    import { default as normalizeUrl } from 'normalize-url'; // https://github.com/sindresorhus/normalize-url
+
+    const normalizedUrl = normalizeUrl(url, {stripProtocol: true, stripHash: true});
+    const hash = web3.utils.keccak256(normalizedUrl);
     ```
 
 4. Receiving INTX tokens
@@ -98,10 +102,42 @@
 ## Appendix
 
 <a name="iab"></a>
-### IAB Brand Safety Categories & Taxonomy
+### IAB Brand Safety Unsafe Categories
+
+The Interactive Advertising Bureau Brand Safety Unsafe Categories refers 13 categories to avoid:
+1. Military conflict
+2. Obscenity
+3. Drugs
+4. Tobacco
+5. Adult
+6. Arms
+7. Crime
+8. Death/injury
+9. Online piracy
+10. Hate speech
+11. Terrorism
+12. Spam/harmful sites
+13. Fake news
 
 <a name="url"></a>
 ### URL Normalization
+
+All participants in Intex Exchange must hash URL the exact same way in order to interact with each others.
+
+The Intex Exchange recommend the following URL normalization scheme:
+- Remove authentication
+- Remove hash
+- Remove protocol and leading slashes
+- Remove port
+- Remove `www.`
+- Remove `utm_` query parameters
+- Remove trailing slashes
+- Sort query parameters alphabetically
+
+```javascript
+normalizeUrl('http://www.intex.com:80/../baz?b=bar&a=foo#hello');
+//=> 'intex.com/baz?a=foo&b=bar'
+```
 
 ### Real-time application
 
