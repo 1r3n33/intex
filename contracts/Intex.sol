@@ -2,8 +2,11 @@ pragma solidity ^0.7.1;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 contract Intex is ERC20 {
+    using SafeMath for uint256;
+
     address public owner;
 
     constructor(uint256 initialSupply) ERC20("IntelligenceExchange", "INTX")
@@ -16,7 +19,7 @@ contract Intex is ERC20 {
     function getTokens() public payable
     {
         uint256 exchangeRate = uint256(10**6); // 1 ETH -> 1M INTEX tokens
-        uint256 tokens = msg.value * exchangeRate;
+        uint256 tokens = msg.value.mul(exchangeRate);
         _mint(msg.sender, tokens);
     }
 

@@ -2,9 +2,11 @@ pragma solidity ^0.7.1;
 pragma experimental ABIEncoderV2;
 
 import "./Intex.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 /// @dev Data Intelligence Exchange
 contract Exchange {
+    using SafeMath for uint256;
 
     /// @dev Owner of the contract
     address public owner;
@@ -47,6 +49,7 @@ contract Exchange {
     }
 
     /// @dev Register sender as provider
+    /// TODO: Prevent register same name multiple times
     function registerAsProvider(bytes32 name) external
     {
         require(providerByAddress[msg.sender].addr == address(0), "Provider address already registered");
@@ -101,7 +104,7 @@ contract Exchange {
     /// @dev Reward checker & provider for service
     function reward(bytes32 checkHash, uint256 providerReward, uint256 checkerReward) public
     {
-        require(token.balanceOf(msg.sender) >= providerReward+checkerReward, "Unsufficient funds");
+        require(token.balanceOf(msg.sender) >= providerReward.add(checkerReward), "Unsufficient funds");
 
         // Reward checker
         DataIntelligenceCheck memory dataIntelligenceCheck = checkByHash[checkHash];
