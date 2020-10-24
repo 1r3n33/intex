@@ -57,7 +57,7 @@
         });
     ```
 
-    The `increaseAllowance` method does not decrease your Intex tokens (INTX) balance.
+    The `increaseAllowance` method does not spend or decrease your Intex tokens (INTX) balance.
 
 3. Storing Brand Safety Intelligence
 
@@ -90,6 +90,21 @@
     const normalizedUrl = normalizeUrl(url, {stripProtocol: true, stripHash: true});
     const hash = web3.utils.keccak256(normalizedUrl);
     ```
+
+    Finally, to store Brand Safety Intelligence on Intex Exchange you must post `hash` of the normalized URL, `type`, `format` and `bytes` of encoded [IAB Brand Safety Unsafe Categories](#iab) ids by calling the `addDataIntelligence` method of the Intex Exchange smart contract.
+
+    ```javascript
+    await exchange.addDataIntelligence(
+        hash, // Hash of the normalized URL
+        type, // Type of data
+        format, // Format of data
+        bytes, // Bytes of encoded IAB Brand Safety Unsafe Categories ids
+        {
+            from: provider_account // Provider Ethereum Account address
+        });
+    ```
+
+    Be aware that calling the `addDataIntelligence` method will spend your Intex tokens (INTX).
 
 4. Receiving INTX tokens
 
