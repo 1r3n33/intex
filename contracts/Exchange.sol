@@ -21,6 +21,7 @@ contract Exchange {
     }
     address[] public providerAddresses;
     mapping (address => Provider) public providerByAddress;
+    mapping (bytes32 => address) public providerAddressByName;
 
     /// @dev Data Intelligence
     struct DataIntelligence {
@@ -49,14 +50,15 @@ contract Exchange {
     }
 
     /// @dev Register sender as provider
-    /// TODO: Prevent register same name multiple times
     function registerAsProvider(bytes32 name) external
     {
         require(providerByAddress[msg.sender].addr == address(0), "Provider address already registered");
+        require(providerAddressByName[name] == address(0), "Provider name already registered");
 
         // Register provider
         providerAddresses.push(msg.sender);
         providerByAddress[msg.sender] = Provider(msg.sender, name);
+        providerAddressByName[name] = msg.sender;
     }
 
     /// @dev Get all providers

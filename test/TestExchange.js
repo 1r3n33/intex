@@ -7,11 +7,20 @@ contract('Exchange', accounts => {
         const instance = await Exchange.deployed();
 
         await instance.registerAsProvider(web3.utils.asciiToHex('provider1'), { from: accounts[1] } );
-        const providers = await instance.getAllProviders();
 
-        assert.equal(providers.length, 1, 'invalid length');
-        assert.equal(providers[0].addr, accounts[1], 'invalid address');
-        assert.equal(providers[0].name, web3.utils.padRight(web3.utils.asciiToHex('provider1'), 64), 'invalid name');
+        const providers = await instance.getAllProviders();
+        assert.deepEqual(providers.length, 1, 'invalid number of providers');
+        assert.deepEqual(providers[0].addr, accounts[1], 'invalid provider address');
+        assert.deepEqual(providers[0].name, web3.utils.padRight(web3.utils.asciiToHex('provider1'), 64), 'invalid provider name');
+
+        const addressByIndex = await instance.providerAddresses(0);
+        assert.deepEqual(addressByIndex, accounts[1], 'invalid address registration');
+
+        const providerByAddress = await instance.providerByAddress(accounts[1]);
+        assert.deepEqual(Object.entries(providerByAddress), Object.entries(providers[0]), 'invalid provider registration');
+
+        const addressByName = await instance.providerAddressByName(web3.utils.asciiToHex('provider1'))
+        assert.deepEqual(addressByName, accounts[1], 'invalid name registration');
     });
 
     it('should register multiple providers', async () => {
@@ -22,12 +31,19 @@ contract('Exchange', accounts => {
         }
 
         const providers = await instance.getAllProviders();
-
-        assert.equal(providers.length, 5, 'invalid length');
-
+        assert.deepEqual(providers.length, 5, 'invalid number of providers');
         for (i = 0; i < 5; i++) {
-            assert.equal(providers[i].addr, accounts[i+1], 'invalid address');
-            assert.equal(providers[i].name, web3.utils.padRight(web3.utils.asciiToHex('provider'+(i+1)), 64), 'invalid name');
+            assert.deepEqual(providers[i].addr, accounts[i+1], 'invalid provider address');
+            assert.deepEqual(providers[i].name, web3.utils.padRight(web3.utils.asciiToHex('provider'+(i+1)), 64), 'invalid provider name');
+
+            const addressByIndex = await instance.providerAddresses(i);
+            assert.deepEqual(addressByIndex, accounts[i+1], 'invalid address registration');
+
+            const providerByAddress = await instance.providerByAddress(accounts[i+1]);
+            assert.deepEqual(Object.entries(providerByAddress), Object.entries(providers[i]), 'invalid provider registration');
+
+            const addressByName = await instance.providerAddressByName(web3.utils.asciiToHex('provider'+(i+1)))
+            assert.deepEqual(addressByName, accounts[i+1], 'invalid name registration');
         }
     });
 
@@ -40,6 +56,23 @@ contract('Exchange', accounts => {
         } catch (exception) {
             assert(
                 exception.message.startsWith('Returned error: VM Exception while processing transaction: revert Provider address already registered'),
+                'invalid exception: ' + exception.message
+            );
+            hasRaisedException = true;
+        }
+
+        assert(hasRaisedException, 'should have raised exception');
+    });
+
+    it('should not register a provider with a name already in use', async () => {
+        const instance = await Exchange.deployed();
+
+        let hasRaisedException = false;
+        try {
+            await instance.registerAsProvider(web3.utils.asciiToHex('provider1'), { from: accounts[6] } );
+        } catch (exception) {
+            assert(
+                exception.message.startsWith('Returned error: VM Exception while processing transaction: revert Provider name already registered'),
                 'invalid exception: ' + exception.message
             );
             hasRaisedException = true;
