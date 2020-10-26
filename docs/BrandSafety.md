@@ -106,7 +106,12 @@
 
     Be aware that calling the `addDataIntelligence` method will spend your Intex tokens (INTX).
 
-4. Receiving INTX tokens
+4. Receiving Intex tokens (INTX)
+
+    Brand Safety providers receive Intex tokens (INTX) in the following situations:
+
+    - Every time Ad Tech companies check Brand Safety Intelligence on Intex Exchange, they pay Intex tokens (INTX) to the Brand Safety provider that has provided the Brand Safety Intelligence.
+    - Every time a reward mechanism is triggered on Ad Tech companies checks. Both the Brand Safety provider and the Ad Tech company receive Intex tokens (INTX).
 
 ### For Ad Tech Companies
 
