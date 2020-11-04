@@ -19,7 +19,7 @@ class App extends React.Component {
   }
 
   onBlockchainDataLoaded(loaded) {
-    this.setState( { connectedToWallet: loaded } );
+    this.setState( { blockchainDataLoaded: loaded } );
   }
 
   render() {
