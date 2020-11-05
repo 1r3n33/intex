@@ -5,13 +5,9 @@ import ExchangeContract from '../contracts/Exchange.json'
 class LoadBlockchainData extends React.Component {
   constructor(props) {
     super(props);
-    
+
     this.exchange = TruffleContract(ExchangeContract);
-    this.exchange.setProvider(this.props.web3.currentProvider)
-    
-    this.state = {
-      providerName: ''
-    };
+    this.exchange.setProvider(this.props.web3.currentProvider);
   }
 
   componentDidMount() {
@@ -19,7 +15,7 @@ class LoadBlockchainData extends React.Component {
       .then(_ => {
         this.props.web3.eth.getAccounts()
           .then(accounts => {
-            this.setState({providerName: accounts[0]});
+            this.props.onBlockchainDataLoaded(accounts[0]);
           });
       })
       .catch(ex => console.log(ex));
@@ -30,9 +26,8 @@ class LoadBlockchainData extends React.Component {
       <div className="App">
         <header className="App-header">
           <p>
-            Loading Blockchain data...  
+            Loading Blockchain data...
           </p>
-          {this.state.providerName}
         </header>
       </div>
     );
