@@ -1,21 +1,22 @@
 import './App.css';
 import React from 'react';
-import ConnectToWallet from './components/ConnectToWallet';
+import ConnectWallet from './components/ConnectWallet';
 import LoadBlockchainData from './components/LoadBlockchainData';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.onConnectedToWallet = this.onConnectedToWallet.bind(this);
+    this.onWalletConnected = this.onWalletConnected.bind(this);
     this.onBlockchainDataLoaded = this.onBlockchainDataLoaded.bind(this);
     this.state = {
-      connectedToWallet: false,
+      web3: null,
+      walletConnected: false,
       blockchainDataLoaded: false
     };
   }
 
-  onConnectedToWallet(connected) {
-    this.setState( { connectedToWallet: connected } );
+  onWalletConnected(web3) {
+    this.setState( { web3: web3, walletConnected: true } );
   }
 
   onBlockchainDataLoaded(loaded) {
@@ -23,13 +24,13 @@ class App extends React.Component {
   }
 
   render() {
-    if (!this.state.connectedToWallet)
+    if (!this.state.walletConnected)
     {
-      return <ConnectToWallet onConnectedToWallet={this.onConnectedToWallet}/>;
+      return <ConnectWallet onWalletConnected={this.onWalletConnected}/>;
     }
     else if (!this.state.blockchainDataLoaded)
     {
-      return <LoadBlockchainData onBlockchainDataLoaded={this.onBlockchainDataLoaded}/>;
+      return <LoadBlockchainData web3={this.state.web3} onBlockchainDataLoaded={this.onBlockchainDataLoaded}/>;
     }
     else
     {

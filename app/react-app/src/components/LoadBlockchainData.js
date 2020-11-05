@@ -7,7 +7,7 @@ class LoadBlockchainData extends React.Component {
     super(props);
     
     this.exchange = TruffleContract(ExchangeContract);
-    this.exchange.setProvider(window.web3.currentProvider)
+    this.exchange.setProvider(this.props.web3.currentProvider)
     
     this.state = {
       providerName: ''
@@ -17,7 +17,7 @@ class LoadBlockchainData extends React.Component {
   componentDidMount() {
     this.exchange.deployed()
       .then(_ => {
-        window.web3.eth.getAccounts()
+        this.props.web3.eth.getAccounts()
           .then(accounts => {
             this.setState({providerName: accounts[0]});
           });
