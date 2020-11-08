@@ -12,10 +12,14 @@ class LoadBlockchainData extends React.Component {
 
   componentDidMount() {
     this.exchange.deployed()
-      .then(_ => {
+      .then(exchange => {
         this.props.web3.eth.getAccounts()
           .then(accounts => {
-            this.props.onBlockchainDataLoaded(accounts[0]);
+            const account = accounts[0];
+            exchange.providerByAddress(account).then(provider => {
+              const registeredProvider = (provider.addr === account) ? provider : null;
+              this.props.onBlockchainDataLoaded( { address: account, provider: registeredProvider } );
+            });
           });
       })
       .catch(ex => console.log(ex));

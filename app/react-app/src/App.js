@@ -10,7 +10,7 @@ class App extends React.Component {
     this.onBlockchainDataLoaded = this.onBlockchainDataLoaded.bind(this);
     this.state = {
       web3: null,
-      address: '',
+      user: null,
       walletConnected: false,
       blockchainDataLoaded: false
     };
@@ -20,8 +20,8 @@ class App extends React.Component {
     this.setState( { web3: web3, walletConnected: true } );
   }
 
-  onBlockchainDataLoaded(address) {
-    this.setState( { address: address, blockchainDataLoaded: true } );
+  onBlockchainDataLoaded(user) {
+    this.setState( { user: user, blockchainDataLoaded: true } );
   }
 
   render() {
@@ -41,7 +41,9 @@ class App extends React.Component {
             <p>
               Welcome to Intex.
             </p>
-            {this.state.address}
+            {this.state.user.address}
+            <br/>
+            {this.state.user.provider ? this.state.web3.utils.hexToString(this.state.user.provider.name) : "Not registered as Provider"}
           </header>
         </div>
       );
