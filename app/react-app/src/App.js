@@ -2,12 +2,14 @@ import './App.css';
 import React from 'react';
 import ConnectWallet from './components/ConnectWallet';
 import LoadBlockchainData from './components/LoadBlockchainData';
+import RegisterProvider from './components/RegisterProvider';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.onWalletConnected = this.onWalletConnected.bind(this);
     this.onBlockchainDataLoaded = this.onBlockchainDataLoaded.bind(this);
+    this.onProviderRegistered = this.onProviderRegistered.bind(this);
     this.state = {
       web3: null,
       user: null,
@@ -24,6 +26,12 @@ class App extends React.Component {
     this.setState( { user: user, blockchainDataLoaded: true } );
   }
 
+  onProviderRegistered(provider) {
+    let user = this.state.user;
+    user.provider = provider;
+    this.setState( { user: user } );
+  }
+
   render() {
     if (!this.state.walletConnected)
     {
@@ -33,17 +41,21 @@ class App extends React.Component {
     {
       return <LoadBlockchainData web3={this.state.web3} onBlockchainDataLoaded={this.onBlockchainDataLoaded}/>;
     }
+    else if (!this.state.user.provider)
+    {
+      return <RegisterProvider web3={this.state.web3} onProviderRegistered={this.onProviderRegistered}/>;
+    }
     else
     {
       return (
         <div className="App">
           <header className="App-header">
             <p>
-              Welcome to Intex.
+            Welcome to Intex.
             </p>
             {this.state.user.address}
             <br/>
-            {this.state.user.provider ? this.state.web3.utils.hexToString(this.state.user.provider.name) : "Not registered as Provider"}
+            {this.state.web3.utils.hexToString(this.state.user.provider.name)}
           </header>
         </div>
       );
