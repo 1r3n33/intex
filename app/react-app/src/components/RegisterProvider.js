@@ -1,4 +1,6 @@
 import React from 'react';
+import 'react-bulma-components/dist/react-bulma-components.min.css';
+import { Button } from 'react-bulma-components';
 
 class RegisterProvider extends React.Component {
   render() {
@@ -8,6 +10,7 @@ class RegisterProvider extends React.Component {
         <p>
         Register as a provider.
         </p>
+        <Button>Register</Button>
         </header>
       </div>
     );
