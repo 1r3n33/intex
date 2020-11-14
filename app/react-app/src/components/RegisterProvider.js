@@ -5,7 +5,25 @@ import { Field, Control, Input } from 'react-bulma-components/lib/components/for
 import Button from 'react-bulma-components/lib/components/button';
 
 class RegisterProvider extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.onInputValueChange = this.onInputValueChange.bind(this);
+    this.onRegisterButtonClick = this.onRegisterButtonClick.bind(this);
+
+    this.state = { providerName: '' };
+  }
+
+  onInputValueChange(e) {
+    this.setState({ providerName: e.target.value })
+  }
+
+  onRegisterButtonClick(e) {
+    console.log(this.state.providerName)
+  }
+
   render() {
+    // TODO: Glue input and button together instead of using separate columns.
     return (
       <div className="App">
         <header className="App-header">
@@ -16,12 +34,12 @@ class RegisterProvider extends React.Component {
           <Columns.Column size={8}>
             <Field>
             <Control>
-              <Input placeholder="Your Provider Name" />
+              <Input placeholder="Your Provider Name" value={this.state.providerName} onChange={this.onInputValueChange}/>
             </Control>
           </Field>
           </Columns.Column>
           <Columns.Column>
-            <Button>Register</Button>
+            <Button color='success' onClick={this.onRegisterButtonClick}>Register</Button>
           </Columns.Column>
         </Columns>
         </header>
