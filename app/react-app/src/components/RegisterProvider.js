@@ -1,6 +1,7 @@
 import React from 'react';
 import 'react-bulma-components/dist/react-bulma-components.min.css';
-import { Field, Control, Label, Input } from 'react-bulma-components/lib/components/form';
+import Columns from 'react-bulma-components/lib/components/columns'
+import { Field, Control, Input } from 'react-bulma-components/lib/components/form';
 import Button from 'react-bulma-components/lib/components/button';
 
 class RegisterProvider extends React.Component {
@@ -11,13 +12,18 @@ class RegisterProvider extends React.Component {
         <p>
         Register as a provider.
         </p>
-        <Field>
-          <Label>Name</Label>
-          <Control>
-            <Input placeholder="Text input" />
-          </Control>
-        </Field>
-        <Button>Register</Button>
+        <Columns gapless>
+          <Columns.Column size={8}>
+            <Field>
+            <Control>
+              <Input placeholder="Your Provider Name" />
+            </Control>
+          </Field>
+          </Columns.Column>
+          <Columns.Column>
+            <Button>Register</Button>
+          </Columns.Column>
+        </Columns>
         </header>
       </div>
     );
