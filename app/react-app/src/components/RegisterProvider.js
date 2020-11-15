@@ -18,10 +18,17 @@ class RegisterProvider extends React.Component {
     this.setState({ providerName: e.target.value });
   }
 
-  async onRegisterButtonClick(e) {
+  onRegisterButtonClick(e) {
+    const address = this.props.user.address;
     const name = this.props.web3.utils.asciiToHex(this.state.providerName);
-    // TODO: check name before calling contract.
-    await this.props.exchange.registerAsProvider(name, { from:this.props.user.address });
+    // TODO: Check name before calling contract.
+    this.props.exchange.registerAsProvider(name, { from:address }).then(_ => {
+      // TODO: Should we create an in-memory provider instead of calling contract?
+      this.props.exchange.providerByAddress(address).then(provider => {
+        const registeredProvider = (provider.addr === address) ? provider : null;
+        this.props.onProviderRegistered(registeredProvider);
+      });
+    });
   }
 
   render() {
