@@ -18,7 +18,7 @@ class LoadBlockchainData extends React.Component {
             const account = accounts[0];
             exchange.providerByAddress(account).then(provider => {
               const registeredProvider = (provider.addr === account) ? provider : null;
-              this.props.onBlockchainDataLoaded( { address: account, provider: registeredProvider } );
+              this.props.onBlockchainDataLoaded( exchange, { address: account, provider: registeredProvider } );
             });
           });
       })

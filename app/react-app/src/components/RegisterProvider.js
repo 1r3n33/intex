@@ -15,11 +15,13 @@ class RegisterProvider extends React.Component {
   }
 
   onInputValueChange(e) {
-    this.setState({ providerName: e.target.value })
+    this.setState({ providerName: e.target.value });
   }
 
-  onRegisterButtonClick(e) {
-    console.log(this.state.providerName)
+  async onRegisterButtonClick(e) {
+    const name = this.props.web3.utils.asciiToHex(this.state.providerName);
+    // TODO: check name before calling contract.
+    await this.props.exchange.registerAsProvider(name, { from:this.props.user.address });
   }
 
   render() {

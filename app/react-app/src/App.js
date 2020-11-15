@@ -12,6 +12,7 @@ class App extends React.Component {
     this.onProviderRegistered = this.onProviderRegistered.bind(this);
     this.state = {
       web3: null,
+      exchangeContract: null,
       user: null,
       walletConnected: false,
       blockchainDataLoaded: false
@@ -22,8 +23,8 @@ class App extends React.Component {
     this.setState( { web3: web3, walletConnected: true } );
   }
 
-  onBlockchainDataLoaded(user) {
-    this.setState( { user: user, blockchainDataLoaded: true } );
+  onBlockchainDataLoaded(exchangeContract, user) {
+    this.setState( { exchangeContract: exchangeContract, user: user, blockchainDataLoaded: true } );
   }
 
   onProviderRegistered(provider) {
@@ -35,15 +36,22 @@ class App extends React.Component {
   render() {
     if (!this.state.walletConnected)
     {
-      return <ConnectWallet onWalletConnected={this.onWalletConnected}/>;
+      return <ConnectWallet
+        onWalletConnected = {this.onWalletConnected}/>;
     }
     else if (!this.state.blockchainDataLoaded)
     {
-      return <LoadBlockchainData web3={this.state.web3} onBlockchainDataLoaded={this.onBlockchainDataLoaded}/>;
+      return <LoadBlockchainData
+        web3 = {this.state.web3}
+        onBlockchainDataLoaded = {this.onBlockchainDataLoaded}/>;
     }
     else if (!this.state.user.provider)
     {
-      return <RegisterProvider web3={this.state.web3} onProviderRegistered={this.onProviderRegistered}/>;
+      return <RegisterProvider
+        web3 = {this.state.web3}
+        exchange = {this.state.exchangeContract}
+        user = {this.state.user}
+        onProviderRegistered = {this.onProviderRegistered}/>;
     }
     else
     {
