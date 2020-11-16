@@ -3,6 +3,7 @@ import React from 'react';
 import ConnectWallet from './components/ConnectWallet';
 import LoadBlockchainData from './components/LoadBlockchainData';
 import RegisterProvider from './components/RegisterProvider';
+import ProviderDashboard from './components/ProviderDashboard';
 
 class App extends React.Component {
   constructor(props) {
@@ -55,18 +56,9 @@ class App extends React.Component {
     }
     else
     {
-      return (
-        <div className="App">
-          <header className="App-header">
-            <p>
-            Welcome to Intex.
-            </p>
-            {this.state.user.address}
-            <br/>
-            {this.state.web3.utils.hexToString(this.state.user.provider.name)}
-          </header>
-        </div>
-      );
+      return <ProviderDashboard
+        web3 = {this.state.web3}
+        user = {this.state.user}/>;
     }
   }
 }
