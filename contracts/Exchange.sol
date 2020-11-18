@@ -31,8 +31,9 @@ contract Exchange {
         uint256 format;
         bytes data;
     }
-    /// @dev Data Intelligence is stored in a data by hash mapping that is unique to each provider.
-    mapping (address => mapping (bytes32 => DataIntelligence)) public dataByHash;
+    /// @dev Each provider has mapping to access Data Intelligence
+    mapping (address => bytes32[]) public dataIntelligenceHashes;
+    mapping (address => mapping (bytes32 => DataIntelligence)) public dataIntelligenceByHash;
 
     struct DataIntelligenceCheck {
         address checker;
@@ -84,7 +85,8 @@ contract Exchange {
         require(token.balanceOf(msg.sender) >= oneThousand, "Unsufficient funds");
 
         // Store Data Intelligence
-        dataByHash[msg.sender][_hash] = DataIntelligence(msg.sender, block.timestamp, _type, _format, _data);
+        dataIntelligenceHashes[msg.sender].push(_hash);
+        dataIntelligenceByHash[msg.sender][_hash] = DataIntelligence(msg.sender, block.timestamp, _type, _format, _data);
 
         // Payment
         // Tokens do not burn, they are sent to owner!
@@ -94,7 +96,7 @@ contract Exchange {
     /// @dev Check Data Intelligence
     function checkDataIntelligence(bytes32 checkHash, address provider, bytes32 dataHash) external
     {
-        DataIntelligence memory dataIntelligence = dataByHash[provider][dataHash];
+        DataIntelligence memory dataIntelligence = dataIntelligenceByHash[provider][dataHash];
 
         checkByHash[checkHash] = DataIntelligenceCheck(msg.sender, block.timestamp, provider, dataHash);
 
@@ -115,7 +117,7 @@ contract Exchange {
         token.transferFrom(msg.sender, dataIntelligenceCheck.checker, checkerReward);
 
         // Reward provider
-        DataIntelligence memory dataIntelligence = dataByHash[dataIntelligenceCheck.provider][dataIntelligenceCheck.dataHash];
+        DataIntelligence memory dataIntelligence = dataIntelligenceByHash[dataIntelligenceCheck.provider][dataIntelligenceCheck.dataHash];
         require(dataIntelligence.provider != address(0), "Cannot find provider");
 
         token.transferFrom(msg.sender, dataIntelligence.provider, providerReward);

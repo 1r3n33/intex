@@ -97,7 +97,10 @@ contract('Exchange', accounts => {
 
         await exchange.addDataIntelligence(hash, type, format, bytes, { from: accounts[1] });
 
-        const dataIntelligence = await exchange.dataByHash(accounts[1], hash);
+        const dataIntelligenceHash = await exchange.dataIntelligenceHashes(accounts[1], 0);
+        assert.equal(dataIntelligenceHash, web3.utils.padRight(hash, 64), 'Invalid hash');
+
+        const dataIntelligence = await exchange.dataIntelligenceByHash(accounts[1], hash);
 
         assert.equal(dataIntelligence.provider, accounts[1], 'Invalid provider');
         assert.equal(dataIntelligence.type_, 0, 'Invalid type');
