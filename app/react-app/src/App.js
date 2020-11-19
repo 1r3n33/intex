@@ -13,7 +13,8 @@ class App extends React.Component {
     this.onProviderRegistered = this.onProviderRegistered.bind(this);
     this.state = {
       web3: null,
-      exchangeContract: null,
+      intex: null,
+      exchange: null,
       user: null,
       walletConnected: false,
       blockchainDataLoaded: false
@@ -24,8 +25,8 @@ class App extends React.Component {
     this.setState( { web3: web3, walletConnected: true } );
   }
 
-  onBlockchainDataLoaded(exchangeContract, user) {
-    this.setState( { exchangeContract: exchangeContract, user: user, blockchainDataLoaded: true } );
+  onBlockchainDataLoaded(intex, exchange, user) {
+    this.setState( { intex: intex, exchange: exchange, user: user, blockchainDataLoaded: true } );
   }
 
   onProviderRegistered(provider) {
@@ -50,7 +51,7 @@ class App extends React.Component {
     {
       return <RegisterProvider
         web3 = {this.state.web3}
-        exchange = {this.state.exchangeContract}
+        exchange = {this.state.exchange}
         user = {this.state.user}
         onProviderRegistered = {this.onProviderRegistered}/>;
     }
@@ -58,6 +59,8 @@ class App extends React.Component {
     {
       return <ProviderDashboard
         web3 = {this.state.web3}
+        intex = {this.state.exchange}
+        exchange = {this.state.exchange}
         user = {this.state.user}/>;
     }
   }
