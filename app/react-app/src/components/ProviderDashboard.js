@@ -5,6 +5,22 @@ import { Field, Control, Input } from 'react-bulma-components/lib/components/for
 import Button from 'react-bulma-components/lib/components/button';
 
 class ProviderDashboard extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.onUrlInputValueChange = this.onUrlInputValueChange.bind(this);
+    this.onAddUrlButtonClick = this.onAddUrlButtonClick.bind(this);
+
+    this.state = { url: '' };
+  }
+
+  onUrlInputValueChange(e) {
+    this.setState({ url: e.target.value });
+  }
+
+  onAddUrlButtonClick(e) {
+  }
+
   render() {
     return (
       <div className="App">
@@ -15,6 +31,14 @@ class ProviderDashboard extends React.Component {
           {this.props.user.address}
           <br/>
           {this.props.web3.utils.hexToString(this.props.user.provider.name)}
+          <Field kind='addons'>
+            <Control>
+              <Input placeholder="URL" value={this.state.url} onChange={this.onUrlInputValueChange}/>
+            </Control>
+            <Control>
+              <Button color='success' onClick={this.onAddUrlButtonClick}>Add</Button>
+            </Control>
+          </Field>
           <Table>
             <thead>
               <tr>
@@ -24,14 +48,6 @@ class ProviderDashboard extends React.Component {
               </tr>
             </thead>
           </Table>
-          <Field kind='addons'>
-            <Control>
-              <Input placeholder="URL"/>
-            </Control>
-            <Control>
-              <Button color='success'>Add</Button>
-            </Control>
-          </Field>
         </header>
       </div>
     );
