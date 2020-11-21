@@ -108,6 +108,19 @@ contract('Exchange', accounts => {
         assert.equal(dataIntelligence.data, web3.utils.asciiToHex('bytes'), 'Invalid data');
     });
 
+    it('should get data intelligences', async () => {
+        const exchange = await Exchange.deployed();
+
+        const dataIntelligences = await exchange.getDataIntelligences(accounts[1]);
+        assert.deepEqual(dataIntelligences.length, 1, 'invalid number of data intelligences');
+        for (i = 0; i < 1; i++) {
+            assert.equal(dataIntelligences[i].provider, accounts[1], 'Invalid provider');
+            assert.equal(dataIntelligences[i].type_, 0, 'Invalid type');
+            assert.equal(dataIntelligences[i].format, 1, 'Invalid format');
+            assert.equal(dataIntelligences[i].data, web3.utils.asciiToHex('bytes'), 'Invalid data');
+        }
+    });
+
     it('should not add data intelligence', async () => {
         const exchange = await Exchange.deployed();
 

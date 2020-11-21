@@ -93,6 +93,18 @@ contract Exchange {
         token.transferFrom(msg.sender, owner, oneThousand);
     }
 
+    /// @dev Get Data Intelligences of provider
+    function getDataIntelligences(address provider) view external returns (DataIntelligence[] memory)
+    {
+        uint count = dataIntelligenceHashes[provider].length;
+        DataIntelligence[] memory dataIntelligences = new DataIntelligence[](count);
+        for (uint i=0; i<count; i++)
+        {
+            dataIntelligences[i] = dataIntelligenceByHash[provider][dataIntelligenceHashes[provider][i]];
+        }
+        return dataIntelligences;
+    }
+
     /// @dev Check Data Intelligence
     function checkDataIntelligence(bytes32 checkHash, address provider, bytes32 dataHash) external
     {
