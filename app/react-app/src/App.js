@@ -59,7 +59,7 @@ class App extends React.Component {
     {
       return <ProviderDashboard
         web3 = {this.state.web3}
-        intex = {this.state.exchange}
+        intex = {this.state.intex}
         exchange = {this.state.exchange}
         user = {this.state.user}/>;
     }
