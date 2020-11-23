@@ -25,10 +25,9 @@ contract Exchange {
 
     /// @dev Data Intelligence
     struct DataIntelligence {
-        address provider;
         uint256 timestamp;
+        bytes source;
         uint256 type_;
-        uint256 format;
         bytes data;
     }
     /// @dev Each provider has mapping to access Data Intelligence
@@ -75,18 +74,21 @@ contract Exchange {
     }
 
     /// @dev Providers can add (or update) Data Intelligence
-    function addDataIntelligence(bytes32 _hash, uint256 _type, uint256 _format, bytes calldata _data) external
+    /// TODO: Add a second method that takes hash as a parameter
+    function addDataIntelligence(bytes calldata dataSource, uint256 dataType, bytes calldata dataIntelligence) external
     {
-        uint256 oneThousand = uint256(1 * (10**3) * (10**18));
+        require(dataSource.length < 256, "Data source length must be less than 256");
+        bytes32 hash = keccak256(dataSource);
 
         Provider memory provider = providerByAddress[msg.sender];
-
         require(provider.addr == msg.sender, "Sender must be provider");
+
+        uint256 oneThousand = uint256(1 * (10**3) * (10**18));
         require(token.balanceOf(msg.sender) >= oneThousand, "Unsufficient funds");
 
         // Store Data Intelligence
-        dataIntelligenceHashes[msg.sender].push(_hash);
-        dataIntelligenceByHash[msg.sender][_hash] = DataIntelligence(msg.sender, block.timestamp, _type, _format, _data);
+        dataIntelligenceHashes[msg.sender].push(hash);
+        dataIntelligenceByHash[msg.sender][hash] = DataIntelligence(block.timestamp, dataSource, dataType, dataIntelligence);
 
         // Payment
         // Tokens do not burn, they are sent to owner!
@@ -108,13 +110,11 @@ contract Exchange {
     /// @dev Check Data Intelligence
     function checkDataIntelligence(bytes32 checkHash, address provider, bytes32 dataHash) external
     {
-        DataIntelligence memory dataIntelligence = dataIntelligenceByHash[provider][dataHash];
-
         checkByHash[checkHash] = DataIntelligenceCheck(msg.sender, block.timestamp, provider, dataHash);
 
         // Payment
         uint256 oneHundred = uint256(1 * (10**2) * (10**18));
-        token.transferFrom(msg.sender, dataIntelligence.provider, oneHundred);
+        token.transferFrom(msg.sender, provider, oneHundred);
     }
 
     /// @dev Reward checker & provider for service
@@ -122,16 +122,14 @@ contract Exchange {
     {
         require(token.balanceOf(msg.sender) >= providerReward.add(checkerReward), "Unsufficient funds");
 
-        // Reward checker
         DataIntelligenceCheck memory dataIntelligenceCheck = checkByHash[checkHash];
         require(dataIntelligenceCheck.checker != address(0), "Cannot find checker");
+        require(dataIntelligenceCheck.provider != address(0), "Cannot find provider");
 
+        // Reward checker
         token.transferFrom(msg.sender, dataIntelligenceCheck.checker, checkerReward);
 
         // Reward provider
-        DataIntelligence memory dataIntelligence = dataIntelligenceByHash[dataIntelligenceCheck.provider][dataIntelligenceCheck.dataHash];
-        require(dataIntelligence.provider != address(0), "Cannot find provider");
-
-        token.transferFrom(msg.sender, dataIntelligence.provider, providerReward);
+        token.transferFrom(msg.sender, dataIntelligenceCheck.provider, providerReward);
     }
 }

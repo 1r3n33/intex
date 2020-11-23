@@ -6,7 +6,7 @@
 
 - Ad Tech companies benefit from Data Intelligence on Intex Marketplace to create secure environments for Publishers & Advertisers.
 
-- Publisher & Advertisers leverage Intex Marketplace to audit Brand Safety controls provided by Ad Tech companies.
+- Publishers & Advertisers leverage Intex Marketplace to audit Brand Safety controls provided by Ad Tech companies.
 
 ## Implementation
 
@@ -64,9 +64,8 @@
     Let's consider, as a Brand Safety Provider, you would like to store a list of [IAB Brand Safety Unsafe Categories](#iab) ids corresponding to unsafe content of a given website.
     You should follow the following steps:
 
-    1. Encoding the list of `type` [IAB Brand Safety Unsafe Categories](#iab) ids into `bytes` using a specific `format`
-    2. Computing the `hash` of the website URL as a key to the `bytes`
-    3. Calling an Intex Exchange smart contract method to write all these information on the blockchain
+    1. Encoding the list of `type` [IAB Brand Safety Unsafe Categories](#iab) ids into `bytes` using a specific format.
+    2. Calling an Intex Exchange smart contract method to store all these information on the blockchain.
 
     The most simple format you can use to encode a type of list of ids into bytes is the following:
 
@@ -78,26 +77,21 @@
     // Javascript code that encodes into an array of integers
     ```
 
-    In the Intex Exchange smart contract, this format is named `Array of integers` and has `format id`: *TBD*.
-
-    To compute the hash of the website URL, you must first make sure the URL is properly [normalized](#url).
-    Then you can compute hash with the `web3.utils.keccak256` method.
+    To pass the website URL to the Intex Exchange smart contract method, you must first make sure the URL is properly [normalized](#url).
 
     ```javascript
     import { default as Web3} from 'web3';
     import { default as normalizeUrl } from 'normalize-url'; // https://github.com/sindresorhus/normalize-url
 
     const normalizedUrl = normalizeUrl(url, {stripProtocol: true, stripHash: true});
-    const hash = web3.utils.keccak256(normalizedUrl);
     ```
 
-    Finally, to store Brand Safety Intelligence on Intex Exchange you must post `hash` of the normalized URL, `type`, `format` and `bytes` of encoded [IAB Brand Safety Unsafe Categories](#iab) ids by calling the `addDataIntelligence` method of the Intex Exchange smart contract.
+    Finally, you can store Brand Safety Intelligence on Intex Exchange by calling the `addDataIntelligence` method of the Intex Exchange smart contract.
 
     ```javascript
     await exchange.addDataIntelligence(
-        hash, // Hash of the normalized URL
-        type, // Type of data
-        format, // Format of data
+        normalizedUrl, // Normalized URL
+        type, // Type of data (0 for now)
         bytes, // Bytes of encoded IAB Brand Safety Unsafe Categories ids
         {
             from: provider_account // Provider Ethereum Account address

@@ -90,34 +90,35 @@ contract('Exchange', accounts => {
         // Allow Exchange to use 1K INTX tokens
         await intex.increaseAllowance(exchange.address, web3.utils.toWei('1000'), { from: accounts[1] });
 
-        const hash = '0x0123456789';
+        const url = web3.utils.asciiToHex('url');
+        const hash = web3.utils.keccak256(url);
         const type = 0;
-        const format = 1;
-        const bytes = web3.utils.asciiToHex('bytes');
+        const data = web3.utils.asciiToHex('data');
 
-        await exchange.addDataIntelligence(hash, type, format, bytes, { from: accounts[1] });
+        await exchange.addDataIntelligence(url, type, data, { from: accounts[1] });
 
         const dataIntelligenceHash = await exchange.dataIntelligenceHashes(accounts[1], 0);
-        assert.equal(dataIntelligenceHash, web3.utils.padRight(hash, 64), 'Invalid hash');
+        assert.equal(dataIntelligenceHash, hash, 'Invalid hash');
 
         const dataIntelligence = await exchange.dataIntelligenceByHash(accounts[1], hash);
-
-        assert.equal(dataIntelligence.provider, accounts[1], 'Invalid provider');
-        assert.equal(dataIntelligence.type_, 0, 'Invalid type');
-        assert.equal(dataIntelligence.format, 1, 'Invalid format');
-        assert.equal(dataIntelligence.data, web3.utils.asciiToHex('bytes'), 'Invalid data');
+        assert.equal(dataIntelligence.source, url, 'Invalid source');
+        assert.equal(dataIntelligence.type_, type, 'Invalid type');
+        assert.equal(dataIntelligence.data, data, 'Invalid data');
     });
 
     it('should get data intelligences', async () => {
         const exchange = await Exchange.deployed();
 
+        const url = web3.utils.asciiToHex('url');
+        const type = 0;
+        const data = web3.utils.asciiToHex('data');
+
         const dataIntelligences = await exchange.getDataIntelligences(accounts[1]);
         assert.deepEqual(dataIntelligences.length, 1, 'invalid number of data intelligences');
         for (i = 0; i < 1; i++) {
-            assert.equal(dataIntelligences[i].provider, accounts[1], 'Invalid provider');
-            assert.equal(dataIntelligences[i].type_, 0, 'Invalid type');
-            assert.equal(dataIntelligences[i].format, 1, 'Invalid format');
-            assert.equal(dataIntelligences[i].data, web3.utils.asciiToHex('bytes'), 'Invalid data');
+            assert.equal(dataIntelligences[i].source, url, 'Invalid source');
+            assert.equal(dataIntelligences[i].type_, type, 'Invalid type');
+            assert.equal(dataIntelligences[i].data, data, 'Invalid data');
         }
     });
 
@@ -126,12 +127,11 @@ contract('Exchange', accounts => {
 
         let hasRaisedException = false;
         try {
-            const hash = '0x0123456789';
+            const url = web3.utils.asciiToHex('url');
             const type = 0;
-            const format = 1;
-            const bytes = web3.utils.asciiToHex('bytes');
-
-            await exchange.addDataIntelligence(hash, type, format, bytes, { from: accounts[9] });
+            const data = web3.utils.asciiToHex('data');
+    
+            await exchange.addDataIntelligence(url, type, data, { from: accounts[9] });
         } catch (exception) {
             assert(
                 exception.message.startsWith('Returned error: VM Exception while processing transaction: revert Sender must be provider'),
@@ -152,11 +152,11 @@ contract('Exchange', accounts => {
         // Allow Exchange to use 1K INTX tokens
         await intex.increaseAllowance(exchange.address, web3.utils.toWei('1000'), { from: accounts[2] });
 
-        const dataHash = '0x0123456789';
+        const url = web3.utils.asciiToHex('url');
+        const dataHash = web3.utils.keccak256(url);
         const type = 0;
-        const format = 1;
-        const bytes = web3.utils.asciiToHex('bytes');
-        await exchange.addDataIntelligence(dataHash, type, format, bytes, { from: accounts[2] });
+        const data = web3.utils.asciiToHex('data');
+        await exchange.addDataIntelligence(url, type, data, { from: accounts[2] });
 
         // Buy 1M Intex tokens
         await intex.getTokens({ from: accounts[3], value: web3.utils.toWei('1') });
@@ -170,7 +170,7 @@ contract('Exchange', accounts => {
 
         assert.equal(dataIntelligenceCheck.checker, accounts[3], 'Invalid checker');
         assert.equal(dataIntelligenceCheck.provider, accounts[2], 'Invalid provider');
-        assert.equal(dataIntelligenceCheck.dataHash, web3.utils.padRight(dataHash, 64), 'Invalid data hash');
+        assert.equal(dataIntelligenceCheck.dataHash, dataHash, 'Invalid data hash');
     });
 
     it('should reward checker and provider', async () => {

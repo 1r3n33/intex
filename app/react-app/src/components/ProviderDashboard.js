@@ -37,19 +37,18 @@ class ProviderDashboard extends React.Component {
   }
 
   async onAddUrlButtonClick(e) {
-    // Create fake data for now.
     const address = this.props.user.address;
-    const hash = this.props.web3.utils.keccak256(this.state.url);
-    const type = 0;
-    const format = 1;
-    const bytes = this.props.web3.utils.asciiToHex(this.state.url);
+    
+    // Create fake data for now.
+    const url = this.props.web3.utils.asciiToHex(this.state.url);
+    const data = this.props.web3.utils.asciiToHex(this.state.url);
 
     try {
       // Before using Intex token to add Data Intelligence, we must increase allowance of the Exchange contract.
       await this.props.intex.increaseAllowance(this.props.exchange.address, this.props.web3.utils.toWei('1000'), { from: address });
 
       // Add fake data intelligence.
-      await this.props.exchange.addDataIntelligence(hash, type, format, bytes, { from: address });
+      await this.props.exchange.addDataIntelligence(url, 0, data, { from: address });
 
       // Get data intelligences to refresh state.
       const dataIntelligences = await this.props.exchange.getDataIntelligences(address);
@@ -69,6 +68,7 @@ class ProviderDashboard extends React.Component {
       return (
         <tr key={index}>
           <td>{index}</td>
+          <td>{dataIntelligence.source}</td>
           <td>{dataIntelligence.data}</td>
           <td>{dataIntelligence.timestamp}</td>
         </tr>
@@ -98,6 +98,7 @@ class ProviderDashboard extends React.Component {
             <thead>
               <tr>
                 <th>Id</th>
+                <th>Url</th>
                 <th>Data</th>
                 <th>Timestamp</th>
               </tr>
