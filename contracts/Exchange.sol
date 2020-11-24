@@ -34,6 +34,9 @@ contract Exchange {
     mapping (address => bytes32[]) public dataIntelligenceHashes;
     mapping (address => mapping (bytes32 => DataIntelligence)) public dataIntelligenceByHash;
 
+    /// @dev Price to add Data Intelligence
+    uint256 public addDataIntelligencePrice;
+
     struct DataIntelligenceCheck {
         address checker;
         uint256 timestamp;
@@ -47,6 +50,7 @@ contract Exchange {
     {
         owner = msg.sender;
         token = _token;
+        addDataIntelligencePrice = uint256(1 * (10**3) * (10**18));
     }
 
     /// @dev Register sender as provider
@@ -83,8 +87,7 @@ contract Exchange {
         Provider memory provider = providerByAddress[msg.sender];
         require(provider.addr == msg.sender, "Sender must be provider");
 
-        uint256 oneThousand = uint256(1 * (10**3) * (10**18));
-        require(token.balanceOf(msg.sender) >= oneThousand, "Unsufficient funds");
+        require(token.balanceOf(msg.sender) >= addDataIntelligencePrice, "Unsufficient funds");
 
         // Store Data Intelligence
         dataIntelligenceHashes[msg.sender].push(hash);
@@ -92,7 +95,7 @@ contract Exchange {
 
         // Payment
         // Tokens do not burn, they are sent to owner!
-        token.transferFrom(msg.sender, owner, oneThousand);
+        token.transferFrom(msg.sender, owner, addDataIntelligencePrice);
     }
 
     /// @dev Get Data Intelligences of provider

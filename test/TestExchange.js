@@ -3,6 +3,19 @@ const Exchange = artifacts.require('Exchange');
 
 contract('Exchange', accounts => {
 
+    it('should deploy with expected state', async () => {
+        const exchange = await Exchange.deployed();
+
+        const owner = await exchange.owner();
+        assert.strictEqual(owner, accounts[0], 'Invalid owner');
+
+        const price = await exchange.addDataIntelligencePrice();
+        assert.strictEqual(
+            price.toString(),
+            web3.utils.toBN(web3.utils.toWei('1000')).toString(),
+            'Invalid price');
+    });
+
     it('should register a single provider', async () => {
         const instance = await Exchange.deployed();
 
@@ -130,7 +143,7 @@ contract('Exchange', accounts => {
             const url = web3.utils.asciiToHex('url');
             const type = 0;
             const data = web3.utils.asciiToHex('data');
-    
+
             await exchange.addDataIntelligence(url, type, data, { from: accounts[9] });
         } catch (exception) {
             assert(
