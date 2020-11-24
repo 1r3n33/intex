@@ -3,6 +3,7 @@ import 'react-bulma-components/dist/react-bulma-components.min.css';
 import Table from 'react-bulma-components/lib/components/table';
 import { Field, Control, Input } from 'react-bulma-components/lib/components/form';
 import Button from 'react-bulma-components/lib/components/button';
+import normalizeUrl from 'normalize-url';
 
 class ProviderDashboard extends React.Component {
   constructor(props) {
@@ -38,10 +39,11 @@ class ProviderDashboard extends React.Component {
 
   async onAddUrlButtonClick(e) {
     const address = this.props.user.address;
-    
-    // Create fake data for now.
-    const url = this.props.web3.utils.asciiToHex(this.state.url);
-    const data = this.props.web3.utils.asciiToHex(this.state.url);
+
+    const normalizedUrl = normalizeUrl(this.state.url, {stripProtocol: true, stripHash: true});
+
+    const url = this.props.web3.utils.asciiToHex(normalizedUrl);
+    const data = this.props.web3.utils.asciiToHex(normalizedUrl);
 
     try {
       // Before using Intex token to add Data Intelligence, we must increase allowance of the Exchange contract.
@@ -68,7 +70,7 @@ class ProviderDashboard extends React.Component {
       return (
         <tr key={index}>
           <td>{index}</td>
-          <td>{dataIntelligence.source}</td>
+          <td>{this.props.web3.utils.hexToAscii(dataIntelligence.source)}</td>
           <td>{dataIntelligence.data}</td>
           <td>{dataIntelligence.timestamp}</td>
         </tr>
