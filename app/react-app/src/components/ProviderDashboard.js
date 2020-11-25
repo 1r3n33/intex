@@ -1,8 +1,9 @@
 import React from 'react';
 import 'react-bulma-components/dist/react-bulma-components.min.css';
-import Table from 'react-bulma-components/lib/components/table';
-import { Field, Control, Input } from 'react-bulma-components/lib/components/form';
+import Columns from 'react-bulma-components/lib/components/columns'
+import { Field, Control, Input, Select } from 'react-bulma-components/lib/components/form';
 import Button from 'react-bulma-components/lib/components/button';
+import Table from 'react-bulma-components/lib/components/table';
 import normalizeUrl from 'normalize-url';
 
 class ProviderDashboard extends React.Component {
@@ -88,14 +89,35 @@ class ProviderDashboard extends React.Component {
           {this.props.user.address}
           <br/>
           {this.props.web3.utils.hexToString(this.props.user.provider.name)}
-          <Field kind='addons'>
-            <Control>
-              <Input placeholder="URL" value={this.state.url} onChange={this.onUrlInputValueChange}/>
-            </Control>
-            <Control>
+          <Columns vCentered={true}>
+            <Columns.Column size={7}>
+              <Field>
+              <Control>
+                <Input placeholder="URL" value={this.state.url} onChange={this.onUrlInputValueChange}/>
+              </Control>
+            </Field>
+            </Columns.Column>
+            <Columns.Column size={4}>
+              <Select name="IAB Brand Safety Categories" value={0} multiple={true}>
+                <option value="1">Military conflict</option>
+                <option value="2">Obscenity</option>
+                <option value="3">Drugs</option>
+                <option value="4">Tobacco</option>
+                <option value="5">Adult</option>
+                <option value="6">Arms</option>
+                <option value="7">Crime</option>
+                <option value="8">Death/injury</option>
+                <option value="9">Online piracy</option>
+                <option value="10">Hate speech</option>
+                <option value="11">Terrorism</option>
+                <option value="12">Spam/harmful sites</option>
+                <option value="13">Fake news</option>
+              </Select>
+            </Columns.Column>
+            <Columns.Column size={1}>
               <Button color='success' onClick={this.onAddUrlButtonClick}>Add</Button>
-            </Control>
-          </Field>
+            </Columns.Column>
+          </Columns>
           <Table>
             <thead>
               <tr>
