@@ -12,9 +12,11 @@ class ProviderDashboard extends React.Component {
 
     this.onUrlInputValueChange = this.onUrlInputValueChange.bind(this);
     this.onAddUrlButtonClick = this.onAddUrlButtonClick.bind(this);
+    this.onBrandSafetyCategoriesSelectionChange = this.onBrandSafetyCategoriesSelectionChange.bind(this);
 
     this.state = {
       url: '',
+      brandSafetyCategories: [],
       dataIntelligences: []
     };
   }
@@ -38,20 +40,32 @@ class ProviderDashboard extends React.Component {
     this.setState({ url: e.target.value });
   }
 
+  onBrandSafetyCategoriesSelectionChange(e) {
+    const categories = Array.from(e.target.selectedOptions, option => option.value);
+    this.setState({ brandSafetyCategories: categories });
+  }
+
   async onAddUrlButtonClick(e) {
     const address = this.props.user.address;
 
     const normalizedUrl = normalizeUrl(this.state.url, {stripProtocol: true, stripHash: true});
 
     const url = this.props.web3.utils.asciiToHex(normalizedUrl);
-    const data = this.props.web3.utils.asciiToHex(normalizedUrl);
+
+    // Build data array: length
+    const length = this.state.brandSafetyCategories.length
+    const buffer = new ArrayBuffer(4*(1+length));
+    const data32 = new Int32Array(buffer);
+    data32[0] = length;
+    data32.set(this.state.brandSafetyCategories, 1);
+    const data8 = new Uint8Array(buffer);
 
     try {
       // Before using Intex token to add Data Intelligence, we must increase allowance of the Exchange contract.
       await this.props.intex.increaseAllowance(this.props.exchange.address, this.props.web3.utils.toWei('1000'), { from: address });
 
-      // Add fake data intelligence.
-      await this.props.exchange.addDataIntelligence(url, 0, data, { from: address });
+      // Add data intelligence.
+      await this.props.exchange.addDataIntelligence(url, 0, data8, { from: address });
 
       // Get data intelligences to refresh state.
       const dataIntelligences = await this.props.exchange.getDataIntelligences(address);
@@ -68,11 +82,34 @@ class ProviderDashboard extends React.Component {
 
   renderTableData() {
     return this.state.dataIntelligences.map((dataIntelligence, index) => {
+      const categories = [
+        'Unknown',
+        'Military conflict',
+        'Obscenity',
+        'Drugs',
+        'Tobacco',
+        'Adult',
+        'Arms',
+        'Crime',
+        'Death/injury',
+        'Online piracy',
+        'Hate speech',
+        'Terrorism',
+        'Spam/harmful sites',
+        'Fake news'
+      ];
+
+      const dataHex = dataIntelligence.data.substring(2); // remove 0x
+      const data8 = Buffer.from(dataHex, 'hex');
+      const data32 = new Int32Array(data8.buffer);
+      const dataCategories = Array.from(data32).slice(1).map(x => categories[x]); // skip length
+      const dataString = dataCategories.join(';');
+
       return (
         <tr key={index}>
           <td>{index}</td>
           <td>{this.props.web3.utils.hexToAscii(dataIntelligence.source)}</td>
-          <td>{dataIntelligence.data}</td>
+          <td>{dataString}</td>
           <td>{dataIntelligence.timestamp}</td>
         </tr>
       );
@@ -81,8 +118,8 @@ class ProviderDashboard extends React.Component {
 
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
+      <div className='App'>
+        <header className='App-header'>
           <p>
             Welcome to Intex.
           </p>
@@ -93,25 +130,25 @@ class ProviderDashboard extends React.Component {
             <Columns.Column size={7}>
               <Field>
               <Control>
-                <Input placeholder="URL" value={this.state.url} onChange={this.onUrlInputValueChange}/>
+                <Input placeholder='URL' value={this.state.url} onChange={this.onUrlInputValueChange}/>
               </Control>
             </Field>
             </Columns.Column>
             <Columns.Column size={4}>
-              <Select name="IAB Brand Safety Categories" value={0} multiple={true}>
-                <option value="1">Military conflict</option>
-                <option value="2">Obscenity</option>
-                <option value="3">Drugs</option>
-                <option value="4">Tobacco</option>
-                <option value="5">Adult</option>
-                <option value="6">Arms</option>
-                <option value="7">Crime</option>
-                <option value="8">Death/injury</option>
-                <option value="9">Online piracy</option>
-                <option value="10">Hate speech</option>
-                <option value="11">Terrorism</option>
-                <option value="12">Spam/harmful sites</option>
-                <option value="13">Fake news</option>
+              <Select multiple={true} value={this.state.brandSafetyCategories} onChange={this.onBrandSafetyCategoriesSelectionChange}>
+                <option value='1'>Military conflict</option>
+                <option value='2'>Obscenity</option>
+                <option value='3'>Drugs</option>
+                <option value='4'>Tobacco</option>
+                <option value='5'>Adult</option>
+                <option value='6'>Arms</option>
+                <option value='7'>Crime</option>
+                <option value='8'>Death/injury</option>
+                <option value='9'>Online piracy</option>
+                <option value='10'>Hate speech</option>
+                <option value='11'>Terrorism</option>
+                <option value='12'>Spam/harmful sites</option>
+                <option value='13'>Fake news</option>
               </Select>
             </Columns.Column>
             <Columns.Column size={1}>
