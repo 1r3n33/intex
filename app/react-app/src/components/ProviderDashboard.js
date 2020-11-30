@@ -31,7 +31,7 @@ class ProviderDashboard extends React.Component {
         dataIntelligences: dataIntelligences
       });
 
-    } catch(ex) {
+    } catch (ex) {
       console.log(ex);
     }
   }
@@ -48,21 +48,23 @@ class ProviderDashboard extends React.Component {
   async onAddUrlButtonClick(e) {
     const address = this.props.user.address;
 
-    const normalizedUrl = normalizeUrl(this.state.url, {stripProtocol: true, stripHash: true});
+    const normalizedUrl = normalizeUrl(this.state.url, { stripProtocol: true, stripHash: true });
 
     const url = this.props.web3.utils.asciiToHex(normalizedUrl);
 
     // Build data array: length
     const length = this.state.brandSafetyCategories.length
-    const buffer = new ArrayBuffer(4*(1+length));
+    const buffer = new ArrayBuffer(4 * (1 + length));
     const data32 = new Int32Array(buffer);
     data32[0] = length;
     data32.set(this.state.brandSafetyCategories, 1);
     const data8 = new Uint8Array(buffer);
 
     try {
+      const price = await this.props.exchange.addDataIntelligencePrice();
+
       // Before using Intex token to add Data Intelligence, we must increase allowance of the Exchange contract.
-      await this.props.intex.increaseAllowance(this.props.exchange.address, this.props.web3.utils.toWei('1000'), { from: address });
+      await this.props.intex.increaseAllowance(this.props.exchange.address, price, { from: address });
 
       // Add data intelligence.
       await this.props.exchange.addDataIntelligence(url, 0, data8, { from: address });
@@ -72,10 +74,11 @@ class ProviderDashboard extends React.Component {
 
       this.setState({
         url: '',
+        brandSafetyCategories: [],
         dataIntelligences: dataIntelligences
       });
 
-    } catch(ex) {
+    } catch (ex) {
       console.log(ex);
     }
   }
@@ -124,15 +127,15 @@ class ProviderDashboard extends React.Component {
             Welcome to Intex.
           </p>
           {this.props.user.address}
-          <br/>
+          <br />
           {this.props.web3.utils.hexToString(this.props.user.provider.name)}
           <Columns vCentered={true}>
             <Columns.Column size={7}>
               <Field>
-              <Control>
-                <Input placeholder='URL' value={this.state.url} onChange={this.onUrlInputValueChange}/>
-              </Control>
-            </Field>
+                <Control>
+                  <Input placeholder='URL' value={this.state.url} onChange={this.onUrlInputValueChange} />
+                </Control>
+              </Field>
             </Columns.Column>
             <Columns.Column size={4}>
               <Select multiple={true} value={this.state.brandSafetyCategories} onChange={this.onBrandSafetyCategoriesSelectionChange}>
