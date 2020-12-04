@@ -20,21 +20,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build smart contracts
+    - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: |
+    - name: Build smart contracts
+      working-directory: .
+      run: |
         npm ci
         npm run build --if-present
         npm test
-      working-directory: .
     - name: Build app
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: |
-        npm ci
-        npm run build --if-present
-        CI=TRUE npm test
       working-directory: ./app/react-app
+      run: |
+        npm install create-react-app
+        yarn
+        CI=TRUE yarn test
