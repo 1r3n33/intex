@@ -84,7 +84,7 @@ class ProviderDashboard extends React.Component {
     const keys = Object.keys(this.brandSafetyCategories.categories);
     return keys.map(k => {
       return (
-        <option value={k}>{this.brandSafetyCategories.categories[k]}</option>
+        <option key={k} value={k}>{this.brandSafetyCategories.categories[k]}</option>
       );
     });
   }
