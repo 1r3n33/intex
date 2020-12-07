@@ -35,4 +35,4 @@ jobs:
       run: |
         npm install create-react-app
         yarn
-        CI=TRUE yarn test
+        CI=TRUE yarn test -- --coverage
