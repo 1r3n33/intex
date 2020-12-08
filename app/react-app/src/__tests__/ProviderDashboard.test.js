@@ -35,7 +35,7 @@ test('renders welcome message', () => {
 
   render(<ProviderDashboard user={user} web3={web3} exchange={exchange}/>);
 
-  const welcome = screen.getByText(/Welcome to Intex./i);
+  const welcome = screen.getByText(/Welcome/i);
   expect(welcome).toBeInTheDocument();
 });
 

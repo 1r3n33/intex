@@ -1,6 +1,7 @@
 import React from 'react';
 import 'react-bulma-components/dist/react-bulma-components.min.css';
-import Columns from 'react-bulma-components/lib/components/columns'
+import Navbar from 'react-bulma-components/lib/components/navbar';
+import Columns from 'react-bulma-components/lib/components/columns';
 import { Field, Control, Input, Select } from 'react-bulma-components/lib/components/form';
 import Button from 'react-bulma-components/lib/components/button';
 import Table from 'react-bulma-components/lib/components/table';
@@ -109,13 +110,25 @@ class ProviderDashboard extends React.Component {
   render() {
     return (
       <div className='App'>
+        <Navbar>
+          <Navbar.Menu>
+            <Navbar.Container>
+              <Navbar.Item>
+                <h1 className='title has-text-weight-normal'>Welcome to <span className='has-text-weight-bold'>Intex</span></h1>
+              </Navbar.Item>
+            </Navbar.Container>
+            <Navbar.Container position='end'>
+              <Navbar.Item>
+                <div>
+                  <h1 className='title is-4'>{this.props.web3.utils.hexToString(this.props.user.provider.name)}</h1>
+                  <h2 className="subtitle is-6">{this.props.user.address}</h2>
+                </div>
+              </Navbar.Item>
+            </Navbar.Container>
+          </Navbar.Menu>
+        </Navbar>
         <header className='App-header'>
-          <p>
-            Welcome to Intex.
-          </p>
-          {this.props.user.address}
           <br />
-          {this.props.web3.utils.hexToString(this.props.user.provider.name)}
           <Columns vCentered={true}>
             <Columns.Column size={7}>
               <Field>
