@@ -19,7 +19,8 @@ class ProviderDashboard extends React.Component {
     this.state = {
       url: '',
       brandSafetyCategories: [],
-      dataIntelligences: []
+      dataIntelligences: [],
+      balance: undefined
     };
 
     this.brandSafetyCategories = new BrandSafetyCategories();
@@ -31,8 +32,11 @@ class ProviderDashboard extends React.Component {
     try {
       const dataIntelligences = await this.props.exchange.getDataIntelligences(address);
 
+      const balance = await this.props.intex.balanceOf(address);
+
       this.setState({
-        dataIntelligences: dataIntelligences
+        dataIntelligences: dataIntelligences,
+        balance: balance
       });
 
     } catch (ex) {
@@ -70,10 +74,14 @@ class ProviderDashboard extends React.Component {
       // Get data intelligences to refresh state.
       const dataIntelligences = await this.props.exchange.getDataIntelligences(address);
 
+      // Get new balance
+      const balance = await this.props.intex.balanceOf(address);
+
       this.setState({
         url: '',
         brandSafetyCategories: [],
-        dataIntelligences: dataIntelligences
+        dataIntelligences: dataIntelligences,
+        balance: balance
       });
 
     } catch (ex) {
@@ -122,6 +130,12 @@ class ProviderDashboard extends React.Component {
                 <div>
                   <h1 className='title is-4'>{this.props.web3.utils.hexToString(this.props.user.provider.name)}</h1>
                   <h2 className="subtitle is-6">{this.props.user.address}</h2>
+                </div>
+              </Navbar.Item>
+              <Navbar.Item>
+                <div>
+                  <h1 className='title is-4'>{this.state.balance ? this.props.web3.utils.fromWei(this.state.balance) : '-'}</h1>
+                  <h2 className="subtitle is-6">INTX</h2>
                 </div>
               </Navbar.Item>
             </Navbar.Container>
