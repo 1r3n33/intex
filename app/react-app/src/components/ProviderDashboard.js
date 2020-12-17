@@ -12,6 +12,7 @@ class ProviderDashboard extends React.Component {
   constructor(props) {
     super(props);
 
+    this.onBalanceClick = this.onBalanceClick.bind(this);
     this.onUrlInputValueChange = this.onUrlInputValueChange.bind(this);
     this.onAddUrlButtonClick = this.onAddUrlButtonClick.bind(this);
     this.onBrandSafetyCategoriesSelectionChange = this.onBrandSafetyCategoriesSelectionChange.bind(this);
@@ -36,6 +37,23 @@ class ProviderDashboard extends React.Component {
 
       this.setState({
         dataIntelligences: dataIntelligences,
+        balance: balance
+      });
+
+    } catch (ex) {
+      console.log(ex);
+    }
+  }
+
+  async onBalanceClick(e) {
+    try {
+      // Buy INTX
+      await this.props.intex.getTokens({ from: this.props.user.address, value: this.props.web3.utils.toWei('1') });
+
+      // Get new balance
+      const balance = await this.props.intex.balanceOf(this.props.user.address);
+
+      this.setState({
         balance: balance
       });
 
@@ -134,8 +152,8 @@ class ProviderDashboard extends React.Component {
               </Navbar.Item>
               <Navbar.Item>
                 <div>
-                  <h1 className='title is-4'>{this.state.balance ? this.props.web3.utils.fromWei(this.state.balance) : '-'}</h1>
-                  <h2 className="subtitle is-6">INTX</h2>
+                  <h1 className='title is-4' onClick={this.onBalanceClick}>{this.state.balance ? this.props.web3.utils.fromWei(this.state.balance) : '-'}</h1>
+                  <h2 className="subtitle is-6" onClick={this.onBalanceClick}>INTX</h2>
                 </div>
               </Navbar.Item>
             </Navbar.Container>
