@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import BrandSafetyCategories from 'components/BrandSafety/Categories';
 import ProviderDashboard from '../components/ProviderDashboard';
 
@@ -12,6 +12,9 @@ import ProviderDashboard from '../components/ProviderDashboard';
 //   PropTypes.number,
 //   PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])),
 // ])
+//
+// Fixed by https://github.com/couds/react-bulma-components/commit/085ae6ed46cce4a7c5766005926069e631d7a225
+//
 const originalError = console.error
 
 beforeAll(() => {
@@ -27,25 +30,47 @@ afterAll(() => {
   console.error.mockRestore()
 })
 
-test('renders welcome message', () => {
-  const provider = { name: 'name' };
-  const user = { address: 'address', provider: provider };
-  const web3 = { utils: { hexToString: function(_) {} } };
-  const exchange = { getDataIntelligences: async function(_) { return []; } };
+function MockProps(address, name, balance) {
+  const provider = { name: "name" };
+  const user = { address: "address", provider: provider };
 
-  render(<ProviderDashboard user={user} web3={web3} exchange={exchange}/>);
+  const web3 = {
+    utils: {
+      hexToString: function (s) {
+        return s;
+      },
+      fromWei: function (_) {
+        return balance;
+      },
+    },
+  };
+
+  const exchange = {
+    getDataIntelligences: async function (_) {
+      return [];
+    },
+  };
+
+  const intex = {
+    balanceOf: async function (_) {
+      return balance;
+    },
+  };
+
+  return { user, web3, exchange, intex };
+}
+
+test('renders welcome message', () => {
+  const props = MockProps('ProviderAddress', 'ProviderName', 'ProviderBalance');
+  render(<ProviderDashboard user={props.user} web3={props.web3} exchange={props.exchange} intex={props.intex}/>);
 
   const welcome = screen.getByText(/Welcome/i);
   expect(welcome).toBeInTheDocument();
 });
 
 test('renders all brand safety categories in Select options', () => {
-  const provider = { name: 'name' };
-  const user = { address: 'address', provider: provider };
-  const web3 = { utils: { hexToString: function(_) {} } };
-  const exchange = { getDataIntelligences: async function(_) { return []; } };
-
-  render(<ProviderDashboard user={user} web3={web3} exchange={exchange}/>);
+  const props = MockProps('ProviderAddress', 'ProviderName', 'ProviderBalance');
+  render(<ProviderDashboard user={props.user} web3={props.web3} exchange={props.exchange} intex={props.intex}/>);
 
   const brandSafetyCategories = new BrandSafetyCategories();
 
@@ -58,4 +83,17 @@ test('renders all brand safety categories in Select options', () => {
     expect(options[i]).toHaveValue(keys[i]);
     expect(options[i]).toHaveTextContent(brandSafetyCategories.categories[keys[i]]);
   }
+});
+
+test('render user information in navbar', async () => {
+  const props = MockProps('ProviderAddress', 'ProviderName', 'ProviderBalance');
+  render(<ProviderDashboard user={props.user} web3={props.web3} exchange={props.exchange} intex={props.intex}/>);
+
+  // Use waitFor to give render the time to resolve async calls and produce the expected output.
+  await waitFor(() => {
+    const navbarItems = screen.getAllByRole('heading');
+    expect(navbarItems[1]).toHaveTextContent(props.user.provider.name);
+    expect(navbarItems[2]).toHaveTextContent(props.user.address);
+    expect(navbarItems[3]).toHaveTextContent('ProviderBalance');
+  });
 });
