@@ -5,6 +5,8 @@ import Columns from 'react-bulma-components/lib/components/columns';
 import { Field, Control, Input, Select } from 'react-bulma-components/lib/components/form';
 import Button from 'react-bulma-components/lib/components/button';
 import Table from 'react-bulma-components/lib/components/table';
+import Modal from 'react-bulma-components/lib/components/modal';
+import Section from 'react-bulma-components/lib/components/section';
 import normalizeUrl from 'normalize-url';
 import BrandSafetyCategories from './BrandSafety/Categories';
 
@@ -12,16 +14,19 @@ class ProviderDashboard extends React.Component {
   constructor(props) {
     super(props);
 
-    this.onBalanceClick = this.onBalanceClick.bind(this);
+    this.onBuyIntexButtonClick = this.onBuyIntexButtonClick.bind(this);
     this.onUrlInputValueChange = this.onUrlInputValueChange.bind(this);
     this.onAddUrlButtonClick = this.onAddUrlButtonClick.bind(this);
     this.onBrandSafetyCategoriesSelectionChange = this.onBrandSafetyCategoriesSelectionChange.bind(this);
+    this.onBuyModalOpen = this.onBuyModalOpen.bind(this);
+    this.onBuyModalClose = this.onBuyModalClose.bind(this);
 
     this.state = {
       url: '',
       brandSafetyCategories: [],
       dataIntelligences: [],
-      balance: undefined
+      balance: undefined,
+      showBuyModal: false
     };
 
     this.brandSafetyCategories = new BrandSafetyCategories();
@@ -45,7 +50,7 @@ class ProviderDashboard extends React.Component {
     }
   }
 
-  async onBalanceClick(e) {
+  async onBuyIntexButtonClick() {
     try {
       // Buy INTX
       await this.props.intex.getTokens({ from: this.props.user.address, value: this.props.web3.utils.toWei('1') });
@@ -54,7 +59,8 @@ class ProviderDashboard extends React.Component {
       const balance = await this.props.intex.balanceOf(this.props.user.address);
 
       this.setState({
-        balance: balance
+        balance: balance,
+        showBuyModal: false
       });
 
     } catch (ex) {
@@ -107,6 +113,18 @@ class ProviderDashboard extends React.Component {
     }
   }
 
+  onBuyModalOpen() {
+    this.setState({
+      showBuyModal: true
+    });
+  }
+
+  onBuyModalClose() {
+    this.setState({
+      showBuyModal: false
+    });
+  }
+
   renderSelectOptions() {
     const keys = Object.keys(this.brandSafetyCategories.categories);
     return keys.map(k => {
@@ -136,6 +154,16 @@ class ProviderDashboard extends React.Component {
   render() {
     return (
       <div className='App'>
+        <Modal show={this.state.showBuyModal} onClose={this.onBuyModalClose}>
+          <Modal.Content>
+            <Section style={{ backgroundColor: 'white' }}>
+              <div>
+                Get 1,000,000 INTX
+              </div>
+              <Button color='success' onClick={this.onBuyIntexButtonClick}>Buy</Button>
+            </Section>
+          </Modal.Content>
+        </Modal>
         <Navbar>
           <Navbar.Menu>
             <Navbar.Container>
@@ -152,8 +180,8 @@ class ProviderDashboard extends React.Component {
               </Navbar.Item>
               <Navbar.Item>
                 <div>
-                  <h1 className='title is-4' onClick={this.onBalanceClick}>{this.state.balance ? this.props.web3.utils.fromWei(this.state.balance) : '-'}</h1>
-                  <h2 className="subtitle is-6" onClick={this.onBalanceClick}>INTX</h2>
+                  <h1 className='title is-4' onClick={this.onBuyModalOpen}>{this.state.balance ? this.props.web3.utils.fromWei(this.state.balance) : '-'}</h1>
+                  <h2 className="subtitle is-6" onClick={this.onBuyModalOpen}>INTX</h2>
                 </div>
               </Navbar.Item>
             </Navbar.Container>
