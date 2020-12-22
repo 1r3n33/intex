@@ -40,6 +40,6 @@
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.3.0",
-    "node-sass": "4.12"
+    "node-sass": "^4.13.1"
   }
 }
