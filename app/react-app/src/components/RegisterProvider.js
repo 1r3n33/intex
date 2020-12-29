@@ -12,12 +12,16 @@ class RegisterProvider extends React.Component {
     super(props);
 
     this.isProviderNameValid = this.isProviderNameValid.bind(this);
+    this.getErrorMessageFromRpcException = this.getErrorMessageFromRpcException.bind(
+      this
+    );
     this.onInputValueChange = this.onInputValueChange.bind(this);
     this.onRegisterButtonClick = this.onRegisterButtonClick.bind(this);
 
     this.state = {
       registerButtonEnabled: false,
       providerName: "",
+      errorMessage: "",
     };
 
     this.providerNameRegex = RegExp("^[a-zA-Z0-9]*$");
@@ -25,6 +29,21 @@ class RegisterProvider extends React.Component {
 
   isProviderNameValid(name) {
     return name.length > 0 && this.providerNameRegex.test(name);
+  }
+
+  getErrorMessageFromRpcException(ex) {
+    try {
+      const first = ex.message.indexOf("{");
+      const last = ex.message.lastIndexOf("}");
+      const json = ex.message.substring(first, last + 1);
+      const rpc = JSON.parse(json);
+      const full = rpc.value.data.message;
+      return full.substring(
+        "VM Exception while processing transaction: revert ".length
+      );
+    } catch (_) {
+      return "Unknown error";
+    }
   }
 
   onInputValueChange(e) {
@@ -37,7 +56,7 @@ class RegisterProvider extends React.Component {
     });
   }
 
-  onRegisterButtonClick(e) {
+  async onRegisterButtonClick(e) {
     const validName = this.isProviderNameValid(this.state.providerName);
     if (!validName) {
       this.setState({
@@ -47,19 +66,21 @@ class RegisterProvider extends React.Component {
       return;
     }
 
-    const address = this.props.user.address;
-    const name = this.props.web3.utils.asciiToHex(this.state.providerName);
+    try {
+      const address = this.props.user.address;
+      const name = this.props.web3.utils.asciiToHex(this.state.providerName);
 
-    this.props.exchange
-      .registerAsProvider(name, { from: address })
-      .then((_) => {
-        // TODO: Should we create an in-memory provider instead of calling contract?
-        this.props.exchange.providerByAddress(address).then((provider) => {
-          const registeredProvider =
-            provider.addr === address ? provider : null;
-          this.props.onProviderRegistered(registeredProvider);
-        });
+      await this.props.exchange.registerAsProvider(name, { from: address });
+
+      const provider = await this.props.exchange.providerByAddress(address);
+
+      const registeredProvider = provider.addr === address ? provider : null;
+      this.props.onProviderRegistered(registeredProvider);
+    } catch (ex) {
+      this.setState({
+        errorMessage: this.getErrorMessageFromRpcException(ex),
       });
+    }
   }
 
   render() {
@@ -74,6 +95,7 @@ class RegisterProvider extends React.Component {
                 value={this.state.providerName}
                 onChange={this.onInputValueChange}
               />
+              <p class="help is-warning">{this.state.errorMessage}</p>
             </Control>
             <Control>
               <Button
