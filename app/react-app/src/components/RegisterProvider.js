@@ -95,7 +95,7 @@ class RegisterProvider extends React.Component {
                 value={this.state.providerName}
                 onChange={this.onInputValueChange}
               />
-              <p class="help is-warning">{this.state.errorMessage}</p>
+              <p className="help is-warning">{this.state.errorMessage}</p>
             </Control>
             <Control>
               <Button
