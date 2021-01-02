@@ -50,6 +50,38 @@ class Navbar extends React.Component {
     }
   }
 
+  renderUser() {
+    return (
+      <BulmaNavbar.Item>
+        <div>
+          <h1 className="title is-4">
+            {this.props.user.provider
+              ? this.props.web3.utils.hexToString(this.props.user.provider.name)
+              : "-"}
+          </h1>
+          <h2 className="subtitle is-6">{this.props.user.address}</h2>
+        </div>
+      </BulmaNavbar.Item>
+    );
+  }
+
+  renderBalance() {
+    return (
+      <BulmaNavbar.Item>
+        <div>
+          <h1 className="title is-4" onClick={this.onBuyModalOpen}>
+            {this.props.balance
+              ? this.props.web3.utils.fromWei(this.props.balance)
+              : "-"}
+          </h1>
+          <h2 className="subtitle is-6" onClick={this.onBuyModalOpen}>
+            INTX
+          </h2>
+        </div>
+      </BulmaNavbar.Item>
+    );
+  }
+
   render() {
     return (
       <div>
@@ -73,28 +105,8 @@ class Navbar extends React.Component {
               </BulmaNavbar.Item>
             </BulmaNavbar.Container>
             <BulmaNavbar.Container position="end">
-              <BulmaNavbar.Item>
-                <div>
-                  <h1 className="title is-4">
-                    {this.props.web3.utils.hexToString(
-                      this.props.user.provider.name
-                    )}
-                  </h1>
-                  <h2 className="subtitle is-6">{this.props.user.address}</h2>
-                </div>
-              </BulmaNavbar.Item>
-              <BulmaNavbar.Item>
-                <div>
-                  <h1 className="title is-4" onClick={this.onBuyModalOpen}>
-                    {this.props.balance
-                      ? this.props.web3.utils.fromWei(this.props.balance)
-                      : "-"}
-                  </h1>
-                  <h2 className="subtitle is-6" onClick={this.onBuyModalOpen}>
-                    INTX
-                  </h2>
-                </div>
-              </BulmaNavbar.Item>
+              {this.renderUser()}
+              {this.renderBalance()}
             </BulmaNavbar.Container>
           </BulmaNavbar.Menu>
         </BulmaNavbar>
