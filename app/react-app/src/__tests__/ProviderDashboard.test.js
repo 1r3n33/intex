@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import BrandSafetyCategories from "components/BrandSafety/Categories";
+import Wallet from "components/Intex/Wallet";
 import ProviderDashboard from "../components/ProviderDashboard";
 
 // There is an issue in react-bulma-components Select when multiple selection is enabled.
@@ -36,8 +37,8 @@ afterAll(() => {
 });
 
 function MockProps(address, name, balance) {
-  const provider = { name: "name" };
-  const user = { address: "address", provider: provider };
+  const provider = { name: name };
+  const user = { address: address, provider: provider };
 
   const web3 = {
     utils: {
@@ -62,7 +63,9 @@ function MockProps(address, name, balance) {
     },
   };
 
-  return { user, web3, exchange, intex };
+  const wallet = new Wallet(intex, address);
+
+  return { user, web3, exchange, intex, wallet };
 }
 
 test("renders all brand safety categories in Select options", () => {
@@ -73,6 +76,7 @@ test("renders all brand safety categories in Select options", () => {
       web3={props.web3}
       exchange={props.exchange}
       intex={props.intex}
+      wallet={props.wallet}
     />
   );
 

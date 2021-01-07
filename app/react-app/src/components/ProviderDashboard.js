@@ -12,7 +12,6 @@ import Table from "react-bulma-components/lib/components/table";
 import normalizeUrl from "normalize-url";
 import BrandSafetyCategories from "./BrandSafety/Categories";
 import Navbar from "./Navbar";
-import Wallet from "./Intex/Wallet";
 
 class ProviderDashboard extends React.Component {
   constructor(props) {
@@ -33,7 +32,6 @@ class ProviderDashboard extends React.Component {
     };
 
     this.brandSafetyCategories = new BrandSafetyCategories();
-    this.wallet = new Wallet(this.props.intex, this.props.user.address);
   }
 
   async componentDidMount() {
@@ -45,7 +43,7 @@ class ProviderDashboard extends React.Component {
       );
 
       // Get new balance
-      const balance = await this.wallet.getBalance();
+      const balance = await this.props.wallet.getBalance();
 
       this.setState({
         dataIntelligences: dataIntelligences,
@@ -103,7 +101,7 @@ class ProviderDashboard extends React.Component {
       );
 
       // Get new balance
-      const balance = await this.wallet.getBalance();
+      const balance = await this.props.wallet.getBalance();
 
       this.setState({
         url: "",
@@ -156,6 +154,7 @@ class ProviderDashboard extends React.Component {
           web3={this.props.web3}
           intex={this.props.intex}
           user={this.props.user}
+          wallet={this.props.wallet}
           balance={this.state.balance}
           onBalanceChange={this.onBalanceChange}
         />

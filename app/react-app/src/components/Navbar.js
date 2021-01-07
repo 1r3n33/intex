@@ -4,7 +4,6 @@ import { default as BulmaNavbar } from "react-bulma-components/lib/components/na
 import Modal from "react-bulma-components/lib/components/modal";
 import Section from "react-bulma-components/lib/components/section";
 import Button from "react-bulma-components/lib/components/button";
-import Wallet from "./Intex/Wallet";
 
 class Navbar extends React.Component {
   constructor(props) {
@@ -17,8 +16,6 @@ class Navbar extends React.Component {
     this.state = {
       showBuyModal: false,
     };
-
-    this.wallet = new Wallet(this.props.intex, this.props.user.address);
   }
 
   onBuyModalOpen() {
@@ -42,7 +39,7 @@ class Navbar extends React.Component {
       });
 
       // Get new balance
-      const balance = await this.wallet.getBalance();
+      const balance = await this.props.wallet.getBalance();
 
       this.setState({
         showBuyModal: false,
