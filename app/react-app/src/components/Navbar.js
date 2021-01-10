@@ -33,10 +33,7 @@ class Navbar extends React.Component {
   async onBuyIntexButtonClick() {
     try {
       // Buy INTX
-      await this.props.intex.getTokens({
-        from: this.props.user.address,
-        value: this.props.web3.utils.toWei("1"),
-      });
+      await this.props.wallet.buy();
 
       // Get new balance
       const balance = await this.props.wallet.getBalance();

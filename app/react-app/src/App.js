@@ -29,7 +29,7 @@ class App extends React.Component {
   }
 
   onBlockchainDataLoaded(intex, exchange, user) {
-    this.wallet = new Wallet(intex, user.address);
+    this.wallet = new Wallet(this.state.web3, intex, user.address);
     this.setState({
       intex: intex,
       exchange: exchange,

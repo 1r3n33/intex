@@ -63,7 +63,7 @@ function MockProps(address, name, balance) {
     },
   };
 
-  const wallet = new Wallet(intex, address);
+  const wallet = new Wallet(web3, intex, address);
 
   return { user, web3, exchange, intex, wallet };
 }
