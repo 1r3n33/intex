@@ -4,6 +4,12 @@ import { default as BulmaNavbar } from "react-bulma-components/lib/components/na
 import Modal from "react-bulma-components/lib/components/modal";
 import Section from "react-bulma-components/lib/components/section";
 import Button from "react-bulma-components/lib/components/button";
+import {
+  Field,
+  Control,
+  Input,
+} from "react-bulma-components/lib/components/form";
+import Columns from "react-bulma-components/lib/components/columns/columns";
 
 class Navbar extends React.Component {
   constructor(props) {
@@ -85,10 +91,32 @@ class Navbar extends React.Component {
         <Modal show={this.state.showBuyModal} onClose={this.onBuyModalClose}>
           <Modal.Content>
             <Section style={{ backgroundColor: "white" }}>
-              <div>Get 1,000,000 INTX</div>
-              <Button color="success" onClick={this.onBuyIntexButtonClick}>
-                Buy
-              </Button>
+              <div>
+                <Columns vCentered={true}>
+                  <Columns.Column size={1}>Pay</Columns.Column>
+                  <Columns.Column size={2}>
+                    <Field kind="addons">
+                      <Control>
+                        <Input placeholder="1" value="1" readOnly={true} />
+                        <p className="help is-warning">
+                          {this.state.errorMessage}
+                        </p>
+                      </Control>
+                    </Field>
+                  </Columns.Column>
+                  <Columns.Column size={7}>
+                    ETH to buy 1,000,000 INTX
+                  </Columns.Column>
+                  <Columns.Column size={1}>
+                    <Button
+                      color="success"
+                      onClick={this.onBuyIntexButtonClick}
+                    >
+                      Buy
+                    </Button>
+                  </Columns.Column>
+                </Columns>
+              </div>
             </Section>
           </Modal.Content>
         </Modal>
