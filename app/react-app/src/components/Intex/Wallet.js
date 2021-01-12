@@ -9,10 +9,10 @@ class Wallet {
     return await this.intex.balanceOf(this.address);
   }
 
-  async buy() {
+  async buy(amount) {
     await this.intex.getTokens({
       from: this.address,
-      value: this.web3.utils.toWei("1"),
+      value: this.web3.utils.toWei(String(amount)),
     });
   }
 }
