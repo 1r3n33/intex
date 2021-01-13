@@ -9,11 +9,17 @@ contract('Exchange', accounts => {
         const owner = await exchange.owner();
         assert.strictEqual(owner, accounts[0], 'Invalid owner');
 
-        const price = await exchange.addDataIntelligencePrice();
+        const addDataIntelligencePrice = await exchange.addDataIntelligencePrice();
         assert.strictEqual(
-            price.toString(),
+            addDataIntelligencePrice.toString(),
             web3.utils.toBN(web3.utils.toWei('1000')).toString(),
-            'Invalid price');
+            'Invalid addDataIntelligencePrice');
+
+        const checkDataIntelligencePrice = await exchange.checkDataIntelligencePrice();
+        assert.strictEqual(
+            checkDataIntelligencePrice.toString(),
+            web3.utils.toBN(web3.utils.toWei('100')).toString(),
+            'Invalid checkDataIntelligencePrice');
     });
 
     it('should register a single provider', async () => {
@@ -171,8 +177,8 @@ contract('Exchange', accounts => {
         const data = web3.utils.asciiToHex('data');
         await exchange.addDataIntelligence(url, type, data, { from: accounts[2] });
 
-        // Buy 1M Intex tokens
-        await intex.getTokens({ from: accounts[3], value: web3.utils.toWei('1') });
+        // Buy 100 Intex tokens
+        await intex.getTokens({ from: accounts[3], value: '100000000000000' });
         // Allow Exchange to use 100 INTX tokens
         await intex.increaseAllowance(exchange.address, web3.utils.toWei('100'), { from: accounts[3] });
 
@@ -184,6 +190,25 @@ contract('Exchange', accounts => {
         assert.equal(dataIntelligenceCheck.checker, accounts[3], 'Invalid checker');
         assert.equal(dataIntelligenceCheck.provider, accounts[2], 'Invalid provider');
         assert.equal(dataIntelligenceCheck.dataHash, dataHash, 'Invalid data hash');
+    });
+
+    it ('should not check data intelligence with unsufficient funds', async () => {
+        const exchange = await Exchange.deployed();
+
+        let hasRaisedException = false;
+        try {
+            const checkHash = '0x9876543210';
+            const dataHash = '0x0123456789';
+            await exchange.checkDataIntelligence(checkHash, accounts[2], dataHash, { from: accounts[3] });
+        } catch (exception) {
+            assert(
+                exception.message.startsWith('Returned error: VM Exception while processing transaction: revert Unsufficient funds'),
+                'invalid exception: ' + exception.message
+            );
+            hasRaisedException = true;
+        }
+
+        assert(hasRaisedException, 'should have raised exception');
     });
 
     it('should reward checker and provider', async () => {

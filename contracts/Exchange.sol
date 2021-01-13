@@ -37,6 +37,9 @@ contract Exchange {
     /// @dev Price to add Data Intelligence
     uint256 public addDataIntelligencePrice;
 
+    /// @dev Price to check Data Intelligence
+    uint256 public checkDataIntelligencePrice;
+
     struct DataIntelligenceCheck {
         address checker;
         uint256 timestamp;
@@ -51,6 +54,7 @@ contract Exchange {
         owner = msg.sender;
         token = _token;
         addDataIntelligencePrice = uint256(1 * (10**3) * (10**18));
+        checkDataIntelligencePrice = uint256(1 * (10**2) * (10**18));
     }
 
     /// @dev Register sender as provider
@@ -113,11 +117,12 @@ contract Exchange {
     /// @dev Check Data Intelligence
     function checkDataIntelligence(bytes32 checkHash, address provider, bytes32 dataHash) external
     {
+        require(token.balanceOf(msg.sender) >= checkDataIntelligencePrice, "Unsufficient funds");
+
         checkByHash[checkHash] = DataIntelligenceCheck(msg.sender, block.timestamp, provider, dataHash);
 
         // Payment
-        uint256 oneHundred = uint256(1 * (10**2) * (10**18));
-        token.transferFrom(msg.sender, provider, oneHundred);
+        token.transferFrom(msg.sender, provider, checkDataIntelligencePrice);
     }
 
     /// @dev Reward checker & provider for service
