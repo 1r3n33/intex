@@ -2,11 +2,26 @@ const Intex = artifacts.require('Intex');
 
 contract('Intex', accounts => {
 
-    it('should deploy with expected balance', async () => {
-        let instance = await Intex.deployed();
+    it("should deploy with expected balance", async () => {
+      const intex = await Intex.deployed();
 
-        let balance = await instance.balanceOf(accounts[0]);
-        assert.equal(balance, web3.utils.toWei('1000000000'), 'invalid balance: ' + balance);
+      const balance = await intex.balanceOf(accounts[0]);
+      assert.equal(
+        balance,
+        web3.utils.toWei("1000000000"),
+        "invalid balance: " + balance
+      );
+    });
+
+    it("should deploy with expected exchange rate", async () => {
+      const intex = await Intex.deployed();
+
+      const exchangeRate = await intex.ethExchangeRate();
+      assert.equal(
+        exchangeRate,
+        1000000,
+        "invalid exchange rate: " + exchangeRate
+      );
     });
 
     it('should mint token on demand', async () => {

@@ -9,17 +9,20 @@ contract Intex is ERC20 {
 
     address public owner;
 
+    /// @dev Eth exchange rate
+    uint256 public ethExchangeRate;
+
     constructor(uint256 initialSupply) ERC20("IntelligenceExchange", "INTX")
     {
         owner = msg.sender;
         _mint(msg.sender, initialSupply); // By default, ERC20 uses a value of 18 for decimals. Unit is 1 * 10**18.
+        ethExchangeRate = uint256(10**6); // 1 ETH -> 1M INTX tokens
     }
 
     // Get INTX tokens in exchange of ETH
     function getTokens() public payable
     {
-        uint256 exchangeRate = uint256(10**6); // 1 ETH -> 1M INTEX tokens
-        uint256 tokens = msg.value.mul(exchangeRate);
+        uint256 tokens = msg.value.mul(ethExchangeRate);
         _mint(msg.sender, tokens);
     }
 
