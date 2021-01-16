@@ -17,10 +17,17 @@ class Navbar extends React.Component {
 
     this.onBuyModalOpen = this.onBuyModalOpen.bind(this);
     this.onBuyModalClose = this.onBuyModalClose.bind(this);
+    this.onEthAmountInputValueChange = this.onEthAmountInputValueChange.bind(
+      this
+    );
     this.onBuyIntexButtonClick = this.onBuyIntexButtonClick.bind(this);
 
     this.state = {
       showBuyModal: false,
+      ethAmount: 1,
+      intxAmount: 1000000,
+      buyButtonEnabled: true,
+      errorMessage: "",
     };
   }
 
@@ -36,10 +43,33 @@ class Navbar extends React.Component {
     });
   }
 
+  async onEthAmountInputValueChange(e) {
+    const newInput = e.target.value;
+
+    const newValue = parseInt(newInput, 10);
+    if (isNaN(newValue) || newValue <= 0) {
+      this.setState({
+        ethAmount: newInput,
+        intxAmount: "-",
+        buyButtonEnabled: false,
+        errorMessage: "Invalid ETH value!",
+      });
+    } else {
+      const intxAmount = await this.props.wallet.convert(newValue);
+
+      this.setState({
+        ethAmount: newValue,
+        intxAmount: intxAmount,
+        buyButtonEnabled: true,
+        errorMessage: "",
+      });
+    }
+  }
+
   async onBuyIntexButtonClick() {
     try {
       // Buy INTX
-      await this.props.wallet.buy(1);
+      await this.props.wallet.buy(this.state.ethAmount);
 
       // Get new balance
       const balance = await this.props.wallet.getBalance();
@@ -97,25 +127,28 @@ class Navbar extends React.Component {
                   <Columns.Column size={2}>
                     <Field kind="addons">
                       <Control>
-                        <Input placeholder="1" value="1" readOnly={true} />
-                        <p className="help is-warning">
-                          {this.state.errorMessage}
-                        </p>
+                        <Input
+                          placeholder="1"
+                          value={this.state.ethAmount}
+                          onChange={this.onEthAmountInputValueChange}
+                        />
                       </Control>
                     </Field>
                   </Columns.Column>
                   <Columns.Column size={7}>
-                    ETH to buy 1,000,000 INTX
+                    ETH to buy {this.state.intxAmount} INTX
                   </Columns.Column>
                   <Columns.Column size={1}>
                     <Button
                       color="success"
                       onClick={this.onBuyIntexButtonClick}
+                      disabled={!this.state.buyButtonEnabled}
                     >
                       Buy
                     </Button>
                   </Columns.Column>
                 </Columns>
+                <p className="help is-warning">{this.state.errorMessage}</p>
               </div>
             </Section>
           </Modal.Content>

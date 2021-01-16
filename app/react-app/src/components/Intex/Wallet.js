@@ -9,11 +9,16 @@ class Wallet {
     return await this.intex.balanceOf(this.address);
   }
 
-  async buy(amount) {
+  async buy(ethAmount) {
     await this.intex.getTokens({
       from: this.address,
-      value: this.web3.utils.toWei(String(amount)),
+      value: this.web3.utils.toWei(String(ethAmount)),
     });
+  }
+
+  async convert(ethAmount) {
+    const exchangeRate = await this.intex.ethExchangeRate();
+    return ethAmount * exchangeRate;
   }
 }
 
