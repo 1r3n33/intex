@@ -32,7 +32,7 @@ function MockProps(address, name, balance) {
 }
 
 test("renders welcome message", () => {
-  const props = MockProps("ProviderAddress", "ProviderName", "ProviderBalance");
+  const props = MockProps("ProviderAddress", "ProviderName", 1000);
   render(<Navbar user={props.user} web3={props.web3} intex={props.intex} />);
 
   const welcome = screen.getByText(/Welcome/i);
@@ -40,13 +40,13 @@ test("renders welcome message", () => {
 });
 
 test("render user information in navbar", async () => {
-  const props = MockProps("ProviderAddress", "ProviderName", "ProviderBalance");
+  const props = MockProps("ProviderAddress", "ProviderName", 1000);
   render(
     <Navbar
       user={props.user}
       web3={props.web3}
       intex={props.intex}
-      balance={"ProviderBalance"}
+      balance={1000}
     />
   );
 
@@ -55,6 +55,6 @@ test("render user information in navbar", async () => {
     const navbarItems = screen.getAllByRole("heading");
     expect(navbarItems[1]).toHaveTextContent(props.user.provider.name);
     expect(navbarItems[2]).toHaveTextContent(props.user.address);
-    expect(navbarItems[3]).toHaveTextContent("ProviderBalance");
+    expect(navbarItems[3]).toHaveTextContent("1,000");
   });
 });

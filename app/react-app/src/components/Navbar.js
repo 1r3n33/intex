@@ -29,6 +29,8 @@ class Navbar extends React.Component {
       buyButtonEnabled: true,
       errorMessage: "",
     };
+
+    this.numberFormat = new Intl.NumberFormat("en-US");
   }
 
   onBuyModalOpen() {
@@ -104,7 +106,9 @@ class Navbar extends React.Component {
         <div>
           <h1 className="title is-4" onClick={this.onBuyModalOpen}>
             {this.props.balance
-              ? this.props.web3.utils.fromWei(this.props.balance)
+              ? this.numberFormat.format(
+                  this.props.web3.utils.fromWei(this.props.balance)
+                )
               : "-"}
           </h1>
           <h2 className="subtitle is-6" onClick={this.onBuyModalOpen}>
@@ -136,7 +140,11 @@ class Navbar extends React.Component {
                     </Field>
                   </Columns.Column>
                   <Columns.Column size={7}>
-                    ETH to buy {this.state.intxAmount} INTX
+                    ETH to buy{" "}
+                    {!isNaN(this.state.intxAmount)
+                      ? this.numberFormat.format(this.state.intxAmount)
+                      : "-"}{" "}
+                    INTX
                   </Columns.Column>
                   <Columns.Column size={1}>
                     <Button
