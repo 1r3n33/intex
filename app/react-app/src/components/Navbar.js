@@ -25,12 +25,19 @@ class Navbar extends React.Component {
     this.state = {
       showBuyModal: false,
       ethAmount: 1,
-      intxAmount: 1000000,
+      intxAmount: undefined, // First resolved when componentDidMount
       buyButtonEnabled: true,
       errorMessage: "",
     };
 
     this.numberFormat = new Intl.NumberFormat("en-US");
+  }
+
+  async componentDidMount() {
+    const intxAmount = await this.props.wallet.convert(this.state.ethAmount);
+    this.setState({
+      intxAmount: intxAmount,
+    });
   }
 
   onBuyModalOpen() {

@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import Wallet from "components/Intex/Wallet";
 import Navbar from "../components/Navbar";
 
 function MockProps(address, name, balance) {
@@ -26,14 +27,27 @@ function MockProps(address, name, balance) {
     balanceOf: async function (_) {
       return balance;
     },
+    ethExchangeRate: async function (_) {
+      return 1;
+    },
   };
 
-  return { user, web3, exchange, intex };
+  const wallet = new Wallet(web3, intex, address);
+
+  return { user, web3, exchange, intex, wallet };
 }
 
 test("renders welcome message", () => {
   const props = MockProps("ProviderAddress", "ProviderName", 1000);
-  render(<Navbar user={props.user} web3={props.web3} intex={props.intex} />);
+  render(
+    <Navbar
+      user={props.user}
+      web3={props.web3}
+      intex={props.intex}
+      balance={1000}
+      wallet={props.wallet}
+    />
+  );
 
   const welcome = screen.getByText(/Welcome/i);
   expect(welcome).toBeInTheDocument();
@@ -47,6 +61,7 @@ test("render user information in navbar", async () => {
       web3={props.web3}
       intex={props.intex}
       balance={1000}
+      wallet={props.wallet}
     />
   );
 

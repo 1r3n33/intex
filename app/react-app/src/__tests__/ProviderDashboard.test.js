@@ -61,6 +61,9 @@ function MockProps(address, name, balance) {
     balanceOf: async function (_) {
       return balance;
     },
+    ethExchangeRate: async function (_) {
+      return 1;
+    },
   };
 
   const wallet = new Wallet(web3, intex, address);
