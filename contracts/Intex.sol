@@ -19,17 +19,25 @@ contract Intex is ERC20 {
         ethExchangeRate = uint256(10**6); // 1 ETH -> 1M INTX tokens
     }
 
-    // Get INTX tokens in exchange of ETH
+    /// @dev Get INTX tokens in exchange of ETH
     function getTokens() public payable
     {
         uint256 tokens = msg.value.mul(ethExchangeRate);
         _mint(msg.sender, tokens);
     }
 
-    // Owner can widraw ETH and transfer to beneficiary
+    /// @dev Owner can widraw ETH and transfer to beneficiary
     function withdraw(address payable beneficiary, uint256 amount) public
     {
         require(msg.sender == owner);
         beneficiary.transfer(amount);
+    }
+
+    /// @dev Owner can set exchange rate
+    function setEthExchangeRate(uint256 rate) external
+    {
+        require(msg.sender == owner, "Sender must be owner");
+        require(rate > 0, "Rate must be greater than zero");
+        ethExchangeRate = rate;
     }
 }
