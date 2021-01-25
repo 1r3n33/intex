@@ -136,6 +136,11 @@ class ProviderDashboard extends React.Component {
     });
   }
 
+  renderTimestamp(timestamp) {
+    var date = new Date(timestamp * 1000);
+    return date.toUTCString();
+  }
+
   renderTableBody() {
     return this.state.dataIntelligences.map((dataIntelligence, index) => {
       const ids = this.brandSafetyCategories.fromHexadecimalString(
@@ -152,7 +157,7 @@ class ProviderDashboard extends React.Component {
           <td>
             <Tag.Group>{this.renderCategories(categories)}</Tag.Group>
           </td>
-          <td>{dataIntelligence.timestamp}</td>
+          <td>{this.renderTimestamp(dataIntelligence.timestamp)}</td>
         </tr>
       );
     });
