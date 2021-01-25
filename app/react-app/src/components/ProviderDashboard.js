@@ -12,6 +12,7 @@ import Table from "react-bulma-components/lib/components/table";
 import normalizeUrl from "normalize-url";
 import BrandSafetyCategories from "./BrandSafety/Categories";
 import Navbar from "./Navbar";
+import Tag from "react-bulma-components/lib/components/tag";
 
 class ProviderDashboard extends React.Component {
   constructor(props) {
@@ -129,18 +130,28 @@ class ProviderDashboard extends React.Component {
     });
   }
 
+  renderCategories(categories) {
+    return categories.map((category) => {
+      return <Tag>{category}</Tag>;
+    });
+  }
+
   renderTableBody() {
     return this.state.dataIntelligences.map((dataIntelligence, index) => {
       const ids = this.brandSafetyCategories.fromHexadecimalString(
         dataIntelligence.data
       );
-      const names = ids.map((id) => this.brandSafetyCategories.categories[id]);
+      const categories = ids.map(
+        (id) => this.brandSafetyCategories.categories[id]
+      );
 
       return (
         <tr key={index}>
           <td>{index}</td>
           <td>{this.props.web3.utils.hexToAscii(dataIntelligence.source)}</td>
-          <td>{names.join(";")}</td>
+          <td>
+            <Tag.Group>{this.renderCategories(categories)}</Tag.Group>
+          </td>
           <td>{dataIntelligence.timestamp}</td>
         </tr>
       );
